@@ -5,7 +5,11 @@ A local Android phone-management (MDM) CLI and dashboard built on Google's
 It applies a locked-down policy to an Android device and lets you change that policy
 from a command-line interface or a local web dashboard.
 
-**Status:** Milestones M1 (Core + CLI) and M2 (Local web dashboard, `v0.2.0`) are complete and tested offline.
+[![Sandstorm Secure launch video: pick the rules, scan one QR code, see which phones comply](docs/media/sandstorm-secure-launch.gif)](docs/media/sandstorm-secure-launch.mp4)
+
+*The 22-second launch video, made from the real demo pages with sample data. [Watch it in full quality, with sound (MP4)](docs/media/sandstorm-secure-launch.mp4).*
+
+**Status:** `v5.0.0`. Milestones M1 (Core + CLI), M2 (local web dashboard), M5 (mock landing page) and M6 (sample-data demo) are complete and tested offline. Next: the live end-to-end proof on the Android emulator (M3) and work-profile mode (M4).
 
 ## What it does
 

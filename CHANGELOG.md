@@ -2,6 +2,14 @@
 
 All notable changes to Sandstorm Secure are documented in this file.
 
+## [5.0.0] — 2026-10-17
+
+### Added
+- Launch video in the README (`docs/media/`), made from the real demo and landing pages.
+
+### Changed
+- Version jumps to **5.0.0**: the first public release of Sandstorm Secure.
+
 ## [0.4.0] — 2026-10-17
 
 ### Changed

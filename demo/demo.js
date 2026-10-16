@@ -9,7 +9,7 @@
     demo_label: "Demo data",
     demo_notice:
       "Demo data \u2014 All devices, policies, and enrollment tokens shown here are sample records from demo/sample-data.json. No Google Cloud account or Android device is connected.",
-    version: "0.4.0",
+    version: "5.0.0",
     devices: [
       {
         id: "sample-pixel6-01",

@@ -1,0 +1,32 @@
+{
+  "alwaysOnVpnPackage": {
+    "packageName": "com.wireguard.android",
+    "lockdownEnabled": true
+  },
+  "usbFileTransferDisabled": true,
+  "playStoreMode": "WHITELIST",
+  "applications": [
+    {
+      "packageName": "com.wireguard.android",
+      "installType": "AVAILABLE",
+      "defaultPermissionPolicy": "GRANT"
+    }
+  ],
+  "screenCaptureDisabled": true,
+  "factoryResetDisabled": true,
+  "passwordRequirements": {
+    "passwordMinimumLength": 6,
+    "passwordQuality": "NUMERIC_COMPLEX",
+    "passwordScope": "SCOPE_DEVICE"
+  },
+  "statusReportingSettings": {
+    "applicationReportsEnabled": true,
+    "deviceSettingsEnabled": true,
+    "displayInfoEnabled": true,
+    "hardwareStatusEnabled": true,
+    "memoryInfoEnabled": true,
+    "networkInfoEnabled": true,
+    "powerManagementEventsEnabled": true,
+    "softwareInfoEnabled": true
+  }
+}

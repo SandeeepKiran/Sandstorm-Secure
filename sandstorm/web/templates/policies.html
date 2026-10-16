@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% block title %}Policies — Sandstorm Secure{% endblock %}
+
+{% block content %}
+<div class="policies-grid">
+  <aside class="card">
+    <h1 class="card-title">Policy Files</h1>
+    <p class="secondary-note">
+      JSON policies stored in <code>policies/</code>. Select one to view or edit its rules.
+    </p>
+    <ul class="policy-list" id="policy-list">
+      {% for item in policies %}
+      <li>
+        <a
+          href="/policies?policy={{ item.id }}"
+          class="policy-item-link {% if item.id == selected_id %}active{% endif %}"
+        >
+          <span>{{ item.id }}.json</span>
+          <span class="secondary-note" style="font-size: 0.78rem;">{{ item.toggles.play_store_mode }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <section class="card">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Edit Policy: <code>{{ selected_id }}</code></h2>
+        <p class="secondary-note">
+          About to save changes to <code>policies/&lt;name&gt;.json</code>. Check "Also upload policy to Google AMAPI now" to push the saved policy to your enterprise immediately.
+        </p>
+      </div>
+    </div>
+
+    <div class="policy-summary-strip" aria-label="Active policy summary">
+      <span class="summary-chip">
+        USB Data: <strong>{% if toggles.usb_file_transfer_disabled %}Blocked{% else %}Allowed{% endif %}</strong>
+      </span>
+      <span class="summary-chip">
+        Screen Capture: <strong>{% if toggles.screen_capture_disabled %}Blocked{% else %}Allowed{% endif %}</strong>
+      </span>
+      <span class="summary-chip">
+        Play Store: <strong>{{ toggles.play_store_mode }}</strong>
+      </span>
+      <span class="summary-chip">
+        Always-On VPN: <strong>{% if toggles.vpn_enabled %}{{ toggles.vpn_package }}{% else %}Off{% endif %}</strong>
+      </span>
+    </div>
+
+    <form method="post" action="/policies/save" class="form-grid" id="policy-edit-form">
+      <div class="form-row">
+        <label for="policy_id">Policy Name (saves to <code>policies/&lt;name&gt;.json</code>)</label>
+        <input
+          type="text"
+          id="policy_id"
+          name="policy_id"
+          value="{{ selected_id }}"
+          required
+        >
+      </div>
+
+      <div class="form-section-title">Hardware &amp; Device Restrictions</div>
+
+      <label class="toggle-row" for="usb_file_transfer_disabled">
+        <input
+          type="checkbox"
+          id="usb_file_transfer_disabled"
+          name="usb_file_transfer_disabled"
+          value="true"
+          {% if toggles.usb_file_transfer_disabled %}checked{% endif %}
+        >
+        <span class="toggle-text">
+          <span class="toggle-title">Disable USB file transfer (<code>usbFileTransferDisabled</code>)</span>
+          <span class="toggle-desc">Blocks MTP/PTP data transfer over USB cables while still allowing charging.</span>
+        </span>
+      </label>
+
+      <label class="toggle-row" for="screen_capture_disabled">
+        <input
+          type="checkbox"
+          id="screen_capture_disabled"
+          name="screen_capture_disabled"
+          value="true"
+          {% if toggles.screen_capture_disabled %}checked{% endif %}
+        >
+        <span class="toggle-text">
+          <span class="toggle-title">Disable screen capture (<code>screenCaptureDisabled</code>)</span>
+          <span class="toggle-desc">Prevents screenshots and screen recordings across the managed device or work profile.</span>
+        </span>
+      </label>
+
+      <label class="toggle-row" for="factory_reset_disabled">
+        <input
+          type="checkbox"
+          id="factory_reset_disabled"
+          name="factory_reset_disabled"
+          value="true"
+          {% if toggles.factory_reset_disabled %}checked{% endif %}
+        >
+        <span class="toggle-text">
+          <span class="toggle-title">Block user factory reset in Settings (<code>factoryResetDisabled</code>)</span>
+          <span class="toggle-desc">Applies to fully-managed devices; prevents resetting the device from the Settings app.</span>
+        </span>
+      </label>
+
+      <div class="form-section-title">Network &amp; Always-On VPN</div>
+
+      <label class="toggle-row" for="vpn_enabled">
+        <input
+          type="checkbox"
+          id="vpn_enabled"
+          name="vpn_enabled"
+          value="true"
+          {% if toggles.vpn_enabled %}checked{% endif %}
+        >
+        <span class="toggle-text">
+          <span class="toggle-title">Enable Always-On VPN (<code>alwaysOnVpnPackage</code>)</span>
+          <span class="toggle-desc">Automatically starts and maintains the specified VPN client package on the device.</span>
+        </span>
+      </label>
+
+      <div class="form-row">
+        <label for="vpn_package">Always-On VPN Package Name</label>
+        <input
+          type="text"
+          id="vpn_package"
+          name="vpn_package"
+          value="{{ toggles.vpn_package }}"
+        >
+      </div>
+
+      <label class="toggle-row" for="vpn_lockdown">
+        <input
+          type="checkbox"
+          id="vpn_lockdown"
+          name="vpn_lockdown"
+          value="true"
+          {% if toggles.vpn_lockdown %}checked{% endif %}
+        >
+        <span class="toggle-text">
+          <span class="toggle-title">Enforce VPN lockdown (<code>lockdownEnabled</code>)</span>
+          <span class="toggle-desc">Blocks network traffic when the Always-On VPN tunnel is not connected.</span>
+        </span>
+      </label>
+
+      <div class="form-section-title">Play Store &amp; Application Allow-List</div>
+
+      <label class="toggle-row" for="play_store_whitelist_only">
+        <input
+          type="checkbox"
+          id="play_store_whitelist_only"
+          name="play_store_whitelist_only"
+          value="true"
+          {% if toggles.play_store_whitelist_only %}checked{% endif %}
+        >
+        <span class="toggle-text">
+          <span class="toggle-title">Restrict Play Store to allow-list only (<code>playStoreMode: WHITELIST</code>)</span>
+          <span class="toggle-desc">When unchecked, sets <code>playStoreMode</code> to <code>BLACKLIST</code> so non-listed Play Store apps remain installable.</span>
+        </span>
+      </label>
+
+      <div class="form-row">
+        <label for="allowed_packages">Allowed Applications (one Android package name per line)</label>
+        <textarea
+          id="allowed_packages"
+          name="allowed_packages"
+          rows="4"
+        >{{ toggles.allowed_packages | join('\n') }}</textarea>
+      </div>
+
+      <div class="form-section-title">Screen-Lock Requirements</div>
+
+      <div class="form-two-col">
+        <div class="form-row">
+          <label for="password_min_length">Minimum PIN / Password Length</label>
+          <input
+            type="number"
+            id="password_min_length"
+            name="password_min_length"
+            min="0"
+            max="16"
+            value="{{ toggles.password_min_length }}"
+          >
+        </div>
+
+        <div class="form-row">
+          <label for="password_quality">Screen-Lock Password Quality</label>
+          <select id="password_quality" name="password_quality">
+            {% for quality in ["NUMERIC", "NUMERIC_COMPLEX", "ALPHABETIC", "ALPHANUMERIC", "COMPLEX"] %}
+            <option value="{{ quality }}" {% if toggles.password_quality == quality %}selected{% endif %}>
+              {{ quality }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section-title">Save &amp; Sync</div>
+
+      <label class="toggle-row" for="upload_to_amapi">
+        <input
+          type="checkbox"
+          id="upload_to_amapi"
+          name="upload_to_amapi"
+          value="true"
+        >
+        <span class="toggle-text">
+          <span class="toggle-title">Also upload policy to Google AMAPI now</span>
+          <span class="toggle-desc">Calls <code>enterprises.policies.patch</code> after saving the local JSON file.</span>
+        </span>
+      </label>
+
+      <div>
+        <button type="submit" class="btn btn-primary" id="save-policy-btn">
+          Save Policy JSON
+        </button>
+      </div>
+    </form>
+
+    <div class="code-preview-header">
+      <h3>Current JSON on Disk (<code>policies/{{ selected_id }}.json</code>)</h3>
+    </div>
+    <pre class="code-preview" id="policy-json-preview">{{ raw_json | tojson(indent=2) }}</pre>
+  </section>
+</div>
+{% endblock %}

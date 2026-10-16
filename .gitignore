@@ -1,0 +1,37 @@
+# Secrets — never commit (AGENTS.md hard rule 3)
+*.json
+!policies/*.json
+!demo/**/*.json
+.env
+.env.*
+*.local.*
+*.pem
+*.p12
+*.key
+
+# Local, machine-specific output
+output/
+sandstorm.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# Playwright
+test-results/
+playwright-report/
+
+# Editors / OS
+.vscode/
+.idea/
+.cursor/
+Thumbs.db
+desktop.ini

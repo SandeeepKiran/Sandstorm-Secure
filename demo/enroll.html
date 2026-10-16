@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enroll Device (Demo Data) — Sandstorm Secure</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="layout-shell">
+    <!-- DM-02: Clear "Demo data" banner on every demo page -->
+    <div class="demo-data-banner" id="demo-data-banner" role="region" aria-label="Demo data notice">
+      <div>
+        <span class="demo-data-pill">Demo data</span>
+        <strong>Interactive portfolio preview loaded from <code>demo/sample-data.json</code>.</strong>
+        Generates a sample QR preview offline with no Google Cloud account required.
+      </div>
+      <a href="../landing/index.html">Back to Landing Page</a>
+    </div>
+
+    <header class="top-header">
+      <div class="brand-block">
+        <p class="brand-title">
+          Sandstorm Secure
+          <span class="local-badge">Static Demo Mode</span>
+        </p>
+        <p class="brand-subtitle">
+          Android phone management via Google Android Management API (AMAPI) — Sample Dataset
+        </p>
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="./index.html" class="nav-link">Devices</a>
+        <a href="./policies.html" class="nav-link">Policies</a>
+        <a href="./enroll.html" class="nav-link active">Enroll</a>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <div class="banner banner-notice" id="demo-action-notice" role="status" hidden></div>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <h1 class="card-title">Enroll an Android Device (Sample QR Preview)</h1>
+            <p class="secondary-note">
+              In the live local dashboard, this requests a one-hour enrollment token from Google AMAPI.
+              In demo mode, it renders a sample QR code preview so you can inspect the enrollment screen offline.
+            </p>
+          </div>
+        </div>
+
+        <div class="enroll-layout">
+          <form class="form-grid" id="enroll-form">
+            <div class="form-row">
+              <label for="mode">Enrollment Mode</label>
+              <select id="mode" name="mode">
+                <option value="fully-managed" selected>
+                  fully-managed (Factory-fresh device / setup wizard)
+                </option>
+                <option value="work-profile">
+                  work-profile (Add managed work profile to an existing device)
+                </option>
+              </select>
+              <span class="field-hint">
+                <code>fully-managed</code> sets <code>PERSONAL_USAGE_DISALLOWED</code>.
+                <code>work-profile</code> sets <code>PERSONAL_USAGE_ALLOWED</code>.
+              </span>
+            </div>
+
+            <div class="form-row">
+              <label for="policy_name">Initial Policy</label>
+              <select id="policy_name" name="policy_name">
+                <option value="baseline" selected>baseline</option>
+                <option value="relaxed">relaxed</option>
+              </select>
+            </div>
+
+            <div>
+              <button type="submit" class="btn btn-primary" id="generate-qr-btn">
+                Generate Enrollment QR Code (Demo)
+              </button>
+            </div>
+          </form>
+
+          <div class="qr-result-box" id="enrollment-result">
+            <h2>Sample Enrollment QR Code Ready</h2>
+            <img
+              src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%22220%22%20viewBox%3D%220%200%20220%20220%22%3E%3Crect%20width%3D%22220%22%20height%3D%22220%22%20fill%3D%22%23ffffff%22%2F%3E%3Crect%20x%3D%2216%22%20y%3D%2216%22%20width%3D%2256%22%20height%3D%2256%22%20fill%3D%22none%22%20stroke%3D%22%230c1626%22%20stroke-width%3D%228%22%2F%3E%3Crect%20x%3D%2230%22%20y%3D%2230%22%20width%3D%2228%22%20height%3D%2228%22%20fill%3D%22%230c1626%22%2F%3E%3Crect%20x%3D%22148%22%20y%3D%2216%22%20width%3D%2256%22%20height%3D%2256%22%20fill%3D%22none%22%20stroke%3D%22%230c1626%22%20stroke-width%3D%228%22%2F%3E%3Crect%20x%3D%22162%22%20y%3D%2230%22%20width%3D%2228%22%20height%3D%2228%22%20fill%3D%22%230c1626%22%2F%3E%3Crect%20x%3D%2216%22%20y%3D%22148%22%20width%3D%2256%22%20height%3D%2256%22%20fill%3D%22none%22%20stroke%3D%22%230c1626%22%20stroke-width%3D%228%22%2F%3E%3Crect%20x%3D%2230%22%20y%3D%22162%22%20width%3D%2228%22%20height%3D%2228%22%20fill%3D%22%230c1626%22%2F%3E%3Crect%20x%3D%2288%22%20y%3D%2288%22%20width%3D%2244%22%20height%3D%2244%22%20fill%3D%22%230c1626%22%2F%3E%3C%2Fsvg%3E"
+              alt="Sample Enrollment QR Code (Demo Data)"
+              class="qr-image"
+              id="enrollment-qr-img"
+            >
+            <div class="qr-meta-list">
+              <p><strong>Mode:</strong> <code id="demo-enroll-mode">fully-managed</code></p>
+              <p><strong>Applied Policy:</strong> <code id="demo-enroll-policy">enterprises/DEMO_SAMPLE_00/policies/baseline</code></p>
+              <p id="enrollment-expiry">
+                <strong>Token Expires At:</strong>
+                <code>2026-10-15T10:30:00Z (1 hour sample token)</code>
+              </p>
+              <p><strong>Saved PNG File:</strong> <code id="demo-enroll-file">output/enroll-fully-managed-baseline.png (sample preview)</code></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Sandstorm Secure v0.4.0 — Static Demo Build (Milestone M6)</span>
+      <span>Demo data only — no real enterprise IDs, keys, or devices.</span>
+    </footer>
+  </div>
+  <script src="./demo.js"></script>
+</body>
+</html>

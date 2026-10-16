@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Enroll Device — Sandstorm Secure{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="card-header">
+    <div>
+      <h1 class="card-title">Enroll an Android Device</h1>
+      <p class="secondary-note">
+        About to request a one-hour enrollment token from Google AMAPI and render a QR code PNG in <code>output/</code>.
+        Never enroll a personal phone — use the <code>Pixel_6</code> emulator only.
+      </p>
+    </div>
+  </div>
+
+  <div class="enroll-layout">
+    <form method="post" action="/enroll" class="form-grid" id="enroll-form">
+      <div class="form-row">
+        <label for="mode">Enrollment Mode</label>
+        <select id="mode" name="mode">
+          <option value="fully-managed" {% if selected_mode == 'fully-managed' %}selected{% endif %}>
+            fully-managed (Factory-fresh device / setup wizard)
+          </option>
+          <option value="work-profile" {% if selected_mode == 'work-profile' %}selected{% endif %}>
+            work-profile (Add managed work profile to an existing device)
+          </option>
+        </select>
+        <span class="field-hint">
+          <code>fully-managed</code> sets <code>PERSONAL_USAGE_DISALLOWED</code>.
+          <code>work-profile</code> sets <code>PERSONAL_USAGE_ALLOWED</code>.
+        </span>
+      </div>
+
+      <div class="form-row">
+        <label for="policy_name">Initial Policy</label>
+        <select id="policy_name" name="policy_name">
+          {% for pol_name in policy_names %}
+          <option value="{{ pol_name }}" {% if selected_policy == pol_name %}selected{% endif %}>
+            {{ pol_name }}
+          </option>
+          {% endfor %}
+        </select>
+        <span class="field-hint">
+          The policy must already be uploaded to AMAPI via the Policies page or <code>sandstorm apply-policy</code>.
+        </span>
+      </div>
+
+      <div>
+        <button type="submit" class="btn btn-primary" id="generate-qr-btn">
+          Generate Enrollment QR Code
+        </button>
+      </div>
+    </form>
+
+    {% if enrollment %}
+    <div class="qr-result-box" id="enrollment-result">
+      <h2>Enrollment QR Code Ready</h2>
+      <img
+        src="/enroll/qr/{{ enrollment.qr_filename }}"
+        alt="Enrollment QR Code for {{ enrollment.mode }}"
+        class="qr-image"
+        id="enrollment-qr-img"
+      >
+      <div class="qr-meta-list">
+        <p><strong>Mode:</strong> <code>{{ enrollment.mode }}</code></p>
+        <p><strong>Applied Policy:</strong> <code>{{ enrollment.policy_name }}</code></p>
+        <p id="enrollment-expiry">
+          <strong>Token Expires At:</strong>
+          <code>{{ enrollment.expiration_timestamp or "Reported by AMAPI upon creation" }}</code>
+        </p>
+        <p><strong>Saved PNG File:</strong> <code>{{ enrollment.qr_path }}</code></p>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <h2>How QR Enrollment Works on <code>Pixel_6</code></h2>
+      <ol>
+        <li>Select <strong>fully-managed</strong> (for a factory-reset emulator at the Welcome screen) or <strong>work-profile</strong> (for an already set-up emulator).</li>
+        <li>Choose the initial policy (<code>baseline</code> or <code>relaxed</code>) and click <strong>Generate Enrollment QR Code</strong>.</li>
+        <li>Point the emulator's virtual camera scene at the generated PNG in <code>output/</code> to enroll.</li>
+      </ol>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

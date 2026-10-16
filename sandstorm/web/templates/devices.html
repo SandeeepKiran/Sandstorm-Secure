@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Devices — Sandstorm Secure{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="card-header">
+    <div>
+      <h1 class="card-title">Enrolled Devices</h1>
+      <p class="secondary-note">
+        Displays live device telemetry reported by Google Android Management API.
+      </p>
+    </div>
+    <form method="get" action="/devices">
+      <button type="submit" class="btn btn-secondary" id="refresh-devices-btn">Refresh from AMAPI</button>
+    </form>
+  </div>
+
+  {% if devices %}
+  <table class="devices-table" id="devices-table">
+    <thead>
+      <tr>
+        <th>Device ID</th>
+        <th>Model</th>
+        <th>Android</th>
+        <th>Active Policy</th>
+        <th>Last Seen</th>
+        <th>Compliance State</th>
+        <th>Switch Policy</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for dev in devices %}
+      <tr data-device-id="{{ dev.id }}">
+        <td data-label="Device ID"><code>{{ dev.id }}</code></td>
+        <td data-label="Model">{{ dev.model }}</td>
+        <td data-label="Android">{{ dev.android_version }}</td>
+        <td data-label="Active Policy"><span class="policy-tag">{{ dev.policy }}</span></td>
+        <td data-label="Last Seen">{{ dev.last_seen }}</td>
+        <td data-label="Compliance State">
+          <span class="status-pill {% if 'NON_COMPLIANT' in dev.compliance_state %}status-pill-warn{% endif %}">
+            {{ dev.compliance_state }}
+          </span>
+        </td>
+        <td data-label="Switch Policy">
+          <form method="post" action="/devices/{{ dev.id }}/switch-policy" class="inline-switch-form">
+            <select name="policy_name" aria-label="Select policy for {{ dev.id }}">
+              {% for pol_name in policy_names %}
+              <option value="{{ pol_name }}" {% if pol_name == dev.policy %}selected{% endif %}>
+                {{ pol_name }}
+              </option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-secondary">Apply</button>
+          </form>
+        </td>
+        <td data-label="Actions">
+          {% if dev.is_wipe_allowed %}
+          <button
+            type="button"
+            class="btn btn-danger open-wipe-modal-btn"
+            data-target-device="{{ dev.id }}"
+          >
+            Wipe…
+          </button>
+          {% else %}
+          <span class="secondary-note">Not in wipe allow-list</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state" id="devices-empty-state">
+    <h2>No enrolled devices</h2>
+    <p>
+      No Android devices are currently returned by Google AMAPI for this enterprise.
+    </p>
+    <ol>
+      <li>Verify that your policies are uploaded on the <a href="/policies">Policies</a> page.</li>
+      <li>Open the <a href="/enroll">Enroll</a> page to generate a setup QR code for your <code>Pixel_6</code> emulator.</li>
+      <li>Scan the QR code from the emulator setup wizard (fully-managed) or work-profile prompt, then click <strong>Refresh from AMAPI</strong> above.</li>
+    </ol>
+  </div>
+  {% endif %}
+</section>
+
+<!-- Typed confirmation dialog for allow-listed device wipe (DB-07 / CO-08) -->
+<div class="wipe-modal-backdrop" id="wipe-modal-backdrop" hidden>
+  <div class="wipe-modal" role="dialog" aria-modal="true" aria-labelledby="wipe-modal-title">
+    <span class="wipe-warning-badge">Destructive Action · Allow-Listed Test Device Only</span>
+    <h2 id="wipe-modal-title">Confirm Remote Device Wipe</h2>
+    <p>
+      <strong>What this will do:</strong> This sends an immediate <code>enterprises.devices.delete</code>
+      command to Google AMAPI. On a fully-managed device, this factory-resets the device back to the setup wizard.
+      On a work-profile device, this removes the work profile and leaves personal apps untouched.
+    </p>
+    <p>
+      To confirm, type the exact device ID <code id="wipe-expected-id"></code> below:
+    </p>
+    <form method="post" id="wipe-confirm-form" action="">
+      <div class="form-row">
+        <label for="wipe-confirmation-input">Device ID confirmation</label>
+        <input
+          type="text"
+          id="wipe-confirmation-input"
+          name="confirmed_device_id"
+          placeholder="Type exact device ID to unlock wipe"
+          autocomplete="off"
+          required
+        >
+      </div>
+      <p class="banner banner-error" id="wipe-mismatch-error" hidden>
+        Typed confirmation does not match the device ID. No wipe request was sent.
+      </p>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-danger" id="wipe-submit-btn">Confirm Wipe</button>
+        <button type="button" class="btn btn-secondary" id="wipe-cancel-btn">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    const backdrop = document.getElementById("wipe-modal-backdrop");
+    const expectedIdEl = document.getElementById("wipe-expected-id");
+    const form = document.getElementById("wipe-confirm-form");
+    const input = document.getElementById("wipe-confirmation-input");
+    const errorEl = document.getElementById("wipe-mismatch-error");
+    const cancelBtn = document.getElementById("wipe-cancel-btn");
+    let currentTargetId = "";
+
+    document.querySelectorAll(".open-wipe-modal-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        currentTargetId = btn.getAttribute("data-target-device") || "";
+        expectedIdEl.textContent = currentTargetId;
+        form.setAttribute("action", "/devices/" + encodeURIComponent(currentTargetId) + "/wipe");
+        input.value = "";
+        errorEl.hidden = true;
+        backdrop.hidden = false;
+        input.focus();
+      });
+    });
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", function () {
+        backdrop.hidden = true;
+      });
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && backdrop && !backdrop.hidden) {
+        backdrop.hidden = true;
+      }
+    });
+
+    if (form) {
+      form.addEventListener("submit", function (event) {
+        if (input.value.trim() !== currentTargetId) {
+          event.preventDefault();
+          errorEl.hidden = false;
+        }
+      });
+    }
+  })();
+</script>
+{% endblock %}

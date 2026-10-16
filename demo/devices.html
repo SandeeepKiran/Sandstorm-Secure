@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devices (Demo Data) — Sandstorm Secure</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="layout-shell">
+    <!-- DM-02: Clear "Demo data" banner on every demo page -->
+    <div class="demo-data-banner" id="demo-data-banner" role="region" aria-label="Demo data notice">
+      <div>
+        <span class="demo-data-pill">Demo data</span>
+        <strong>Interactive portfolio preview loaded from <code>demo/sample-data.json</code>.</strong>
+        No Google account, service-account key, or Android device is connected.
+      </div>
+      <a href="../landing/index.html">Back to Landing Page</a>
+    </div>
+
+    <header class="top-header">
+      <div class="brand-block">
+        <p class="brand-title">
+          Sandstorm Secure
+          <span class="local-badge">Static Demo Mode</span>
+        </p>
+        <p class="brand-subtitle">
+          Android phone management via Google Android Management API (AMAPI) — Sample Dataset
+        </p>
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="./index.html" class="nav-link active">Devices</a>
+        <a href="./policies.html" class="nav-link">Policies</a>
+        <a href="./enroll.html" class="nav-link">Enroll</a>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <div class="banner banner-notice" id="demo-action-notice" role="status" hidden></div>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <h1 class="card-title">Enrolled Devices (Sample Fleet)</h1>
+            <p class="secondary-note">
+              Displays sample device records from <code>demo/sample-data.json</code>. Try switching a device’s policy below.
+            </p>
+          </div>
+          <button type="button" class="btn btn-secondary" id="refresh-devices-btn">
+            Refresh Sample Data
+          </button>
+        </div>
+
+        <table class="devices-table" id="devices-table">
+          <thead>
+            <tr>
+              <th>Device ID</th>
+              <th>Model</th>
+              <th>Android</th>
+              <th>Active Policy</th>
+              <th>Last Seen</th>
+              <th>Compliance State</th>
+              <th>Switch Policy</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-device-id="sample-pixel6-01">
+              <td data-label="Device ID"><code>sample-pixel6-01</code></td>
+              <td data-label="Model">Pixel 6 (Emulator Sample)</td>
+              <td data-label="Android">14</td>
+              <td data-label="Active Policy"><span class="policy-tag active-policy-tag">baseline</span></td>
+              <td data-label="Last Seen">2026-10-15T09:12:00Z</td>
+              <td data-label="Compliance State">
+                <span class="status-pill">COMPLIANT</span>
+              </td>
+              <td data-label="Switch Policy">
+                <form class="inline-switch-form" data-device-id="sample-pixel6-01">
+                  <select name="policy_name" aria-label="Select policy for sample-pixel6-01">
+                    <option value="baseline" selected>baseline</option>
+                    <option value="relaxed">relaxed</option>
+                  </select>
+                  <button type="submit" class="btn btn-secondary">Apply</button>
+                </form>
+              </td>
+              <td data-label="Actions">
+                <!-- DM-04: Dangerous buttons (wipe) are visibly disabled in demo mode -->
+                <button
+                  type="button"
+                  class="btn btn-danger wipe-demo-btn"
+                  disabled
+                  aria-disabled="true"
+                  title="Remote wipe is disabled in static demo mode"
+                >
+                  Wipe (Disabled in Demo)
+                </button>
+                <span class="disabled-wipe-note">Disabled in demo mode (DM-04)</span>
+              </td>
+            </tr>
+
+            <tr data-device-id="sample-galaxya54-02">
+              <td data-label="Device ID"><code>sample-galaxya54-02</code></td>
+              <td data-label="Model">Galaxy A54 (Work Profile Sample)</td>
+              <td data-label="Android">14</td>
+              <td data-label="Active Policy"><span class="policy-tag active-policy-tag">relaxed</span></td>
+              <td data-label="Last Seen">2026-10-15T09:10:00Z</td>
+              <td data-label="Compliance State">
+                <span class="status-pill">COMPLIANT</span>
+              </td>
+              <td data-label="Switch Policy">
+                <form class="inline-switch-form" data-device-id="sample-galaxya54-02">
+                  <select name="policy_name" aria-label="Select policy for sample-galaxya54-02">
+                    <option value="baseline">baseline</option>
+                    <option value="relaxed" selected>relaxed</option>
+                  </select>
+                  <button type="submit" class="btn btn-secondary">Apply</button>
+                </form>
+              </td>
+              <td data-label="Actions">
+                <button
+                  type="button"
+                  class="btn btn-danger wipe-demo-btn"
+                  disabled
+                  aria-disabled="true"
+                  title="Remote wipe is disabled in static demo mode"
+                >
+                  Wipe (Disabled in Demo)
+                </button>
+                <span class="disabled-wipe-note">Not in allow-list · Demo mode</span>
+              </td>
+            </tr>
+
+            <tr data-device-id="sample-motog54-03">
+              <td data-label="Device ID"><code>sample-motog54-03</code></td>
+              <td data-label="Model">Moto G54 (Field Sample)</td>
+              <td data-label="Android">13</td>
+              <td data-label="Active Policy"><span class="policy-tag active-policy-tag">baseline</span></td>
+              <td data-label="Last Seen">2026-10-15T08:45:00Z</td>
+              <td data-label="Compliance State">
+                <span class="status-pill status-pill-warn">NON_COMPLIANT (alwaysOnVpnPackage)</span>
+              </td>
+              <td data-label="Switch Policy">
+                <form class="inline-switch-form" data-device-id="sample-motog54-03">
+                  <select name="policy_name" aria-label="Select policy for sample-motog54-03">
+                    <option value="baseline" selected>baseline</option>
+                    <option value="relaxed">relaxed</option>
+                  </select>
+                  <button type="submit" class="btn btn-secondary">Apply</button>
+                </form>
+              </td>
+              <td data-label="Actions">
+                <button
+                  type="button"
+                  class="btn btn-danger wipe-demo-btn"
+                  disabled
+                  aria-disabled="true"
+                  title="Remote wipe is disabled in static demo mode"
+                >
+                  Wipe (Disabled in Demo)
+                </button>
+                <span class="disabled-wipe-note">Disabled in demo mode (DM-04)</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Sandstorm Secure v0.4.0 — Static Demo Build (Milestone M6)</span>
+      <span>Demo data only — no real enterprise IDs, keys, or devices.</span>
+    </footer>
+  </div>
+  <script src="./demo.js"></script>
+</body>
+</html>

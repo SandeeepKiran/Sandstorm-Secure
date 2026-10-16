@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sandstorm Secure — Managed Android Phone Lockdown (Portfolio Demo)</title>
+  <style>
+    /* Sandstorm Mock Landing Page (Milestone M5: LP-01 through LP-07)
+     * Owner's palette:
+     *   Background: linear-gradient(135deg, #0f766e 0%, #134e4a 45%, #0c1626 100%)
+     *   Accent:     #99f6e4
+     *   Body text:  #d5ece8
+     *   Secondary:  #a7d3cc
+     *   Headings:   #ffffff
+     *   Font:       Segoe UI / system sans-serif (no external fonts or CDNs)
+     */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f766e 0%, #134e4a 45%, #0c1626 100%);
+      --surface-bg: rgba(12, 22, 38, 0.78);
+      --surface-elevated: rgba(19, 78, 74, 0.38);
+      --surface-border: rgba(153, 246, 228, 0.24);
+      --accent: #99f6e4;
+      --accent-strong: #5eead4;
+      --text-body: #d5ece8;
+      --text-secondary: #a7d3cc;
+      --text-heading: #ffffff;
+      --shadow-soft: 0 16px 36px rgba(6, 12, 22, 0.44);
+      --radius-card: 16px;
+      --radius-control: 8px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      width: 100%;
+      overflow-x: hidden;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-body);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    h1, h2, h3 {
+      color: var(--text-heading);
+      margin-top: 0;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover,
+    a:focus-visible {
+      text-decoration: underline;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.88em;
+      background: rgba(6, 12, 22, 0.55);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: 5px;
+      border: 1px solid rgba(153, 246, 228, 0.16);
+    }
+
+    .page-shell {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 24px 20px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* LP-06: Visible portfolio demo notice banner */
+    .portfolio-demo-banner {
+      padding: 13px 18px;
+      border-radius: var(--radius-control);
+      background: rgba(15, 118, 110, 0.52);
+      border: 1px solid var(--accent);
+      color: var(--text-heading);
+      font-size: 0.93rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .demo-pill {
+      display: inline-block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #0c1626;
+      margin-right: 8px;
+    }
+
+    /* Top header */
+    .site-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 24px;
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .brand-name {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin: 0;
+    }
+
+    .header-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 0.94rem;
+      font-weight: 600;
+    }
+
+    /* Hero section */
+    .hero-card {
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-card);
+      padding: 36px 32px;
+      box-shadow: var(--shadow-soft);
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .hero-headline {
+      font-size: 2.1rem;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+
+    .hero-lead {
+      font-size: 1.06rem;
+      color: var(--text-body);
+      margin: 0 0 22px;
+      max-width: 62ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 20px;
+      border-radius: var(--radius-control);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0c1626;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-strong);
+      text-decoration: none;
+    }
+
+    .btn-secondary {
+      background: rgba(153, 246, 228, 0.12);
+      color: var(--accent);
+      border-color: var(--surface-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(153, 246, 228, 0.22);
+      text-decoration: none;
+    }
+
+    /* Who it is for card inside hero */
+    .audience-box {
+      background: var(--surface-elevated);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 22px;
+    }
+
+    .audience-box h2 {
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+
+    .audience-box p {
+      margin: 0 0 10px;
+      font-size: 0.94rem;
+    }
+
+    .audience-box p:last-child {
+      margin-bottom: 0;
+      color: var(--text-secondary);
+      font-size: 0.89rem;
+    }
+
+    /* Two-column content grid */
+    .section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-card);
+      padding: 28px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card h2 {
+      font-size: 1.35rem;
+      margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.93rem;
+      margin: 0 0 18px;
+    }
+
+    .feature-list {
+      margin: 0;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .feature-list li {
+      padding-left: 4px;
+    }
+
+    .feature-list strong {
+      color: var(--text-heading);
+    }
+
+    /* Visibility comparison (what MDM can and cannot see) */
+    .visibility-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .vis-box {
+      padding: 16px 18px;
+      border-radius: 10px;
+      background: rgba(6, 12, 22, 0.52);
+      border: 1px solid var(--surface-border);
+    }
+
+    .vis-box h3 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+
+    .vis-box ul {
+      margin: 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.92rem;
+    }
+
+    /* Sign-up form (LP-03, LP-04) */
+    .signup-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 640px;
+    }
+
+    .form-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field label {
+      font-weight: 600;
+      font-size: 0.93rem;
+      color: var(--text-heading);
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-control);
+      border: 1px solid var(--surface-border);
+      background: rgba(12, 22, 38, 0.9);
+      color: var(--text-heading);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    .demo-submit-confirmation {
+      padding: 14px 18px;
+      border-radius: var(--radius-control);
+      background: rgba(15, 118, 110, 0.55);
+      border: 1px solid var(--accent);
+      color: var(--text-heading);
+      font-weight: 600;
+    }
+
+    .demo-submit-confirmation[hidden] {
+      display: none;
+    }
+
+    .site-footer {
+      padding-top: 18px;
+      border-top: 1px solid var(--surface-border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 768px) {
+      .page-shell {
+        padding: 14px 12px 32px;
+        gap: 20px;
+      }
+
+      .hero-card {
+        grid-template-columns: 1fr;
+        padding: 22px 18px;
+      }
+
+      .hero-headline {
+        font-size: 1.65rem;
+      }
+
+      .section-grid,
+      .visibility-columns,
+      .form-two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 18px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <!-- LP-06: Visible note stating this is a portfolio demo and no data is collected -->
+    <div class="portfolio-demo-banner" id="portfolio-demo-note" role="note">
+      <div>
+        <span class="demo-pill">Portfolio Demo</span>
+        <strong>This page is a portfolio demo and no data is collected.</strong>
+        Submitting the form below sends no network requests and stores nothing.
+      </div>
+      <a href="../demo/index.html">Open Interactive Demo Dashboard</a>
+    </div>
+
+    <header class="site-header">
+      <p class="brand-name">Sandstorm Secure</p>
+      <nav class="header-links" aria-label="Page sections">
+        <a href="#what-it-does">What It Does</a>
+        <a href="#privacy-visibility">What MDM Can &amp; Cannot See</a>
+        <a href="#demo-signup">Mock Sign-Up Form</a>
+        <a href="../demo/index.html">Sample-Data Dashboard</a>
+      </nav>
+    </header>
+
+    <!-- LP-01: Headline + Who it is for -->
+    <section class="hero-card">
+      <div>
+        <h1 class="hero-headline" id="hero-headline">
+          Lock down company Android phones with Google’s official Android Management API.
+        </h1>
+        <p class="hero-lead">
+          Sandstorm Secure configures and enforces device rules — Always-On VPN, USB data transfer block,
+          Play Store allow-lists, and remote wipe — through a clean Python CLI and local dashboard,
+          so lost phones or accidental installs do not expose work data.
+        </p>
+        <div class="hero-actions">
+          <a href="#demo-signup" class="btn btn-primary">Try Mock Interest Form</a>
+          <a href="../demo/index.html" class="btn btn-secondary">Explore Sample Dashboard</a>
+        </div>
+      </div>
+
+      <aside class="audience-box" id="who-it-is-for">
+        <h2>Who This Is For</h2>
+        <p>
+          <strong>Small teams with 5 to 50 company Android phones and no dedicated IT administrator</strong> —
+          such as field service crews, clinics, delivery teams, and agencies that hand out work phones
+          or add managed work profiles to staff devices.
+        </p>
+        <p>
+          Instead of writing a custom Android agent, Sandstorm Secure uses Google’s built-in
+          <code>Android Device Policy</code> enforcement engine.
+        </p>
+      </aside>
+    </section>
+
+    <!-- LP-01: 3-5 bullets of what it does -->
+    <section class="card" id="what-it-does">
+      <h2>What Sandstorm Secure Enforces on Managed Phones</h2>
+      <p class="section-subtitle">
+        Every policy rule below maps directly to a documented Google Android Management API (AMAPI) setting.
+      </p>
+      <ul class="feature-list" id="capabilities-list">
+        <li>
+          <strong>Always-On VPN with Lockdown (<code>alwaysOnVpnPackage</code>):</strong>
+          Keeps your chosen VPN app (such as WireGuard) connected at all times and blocks network traffic when the tunnel is down.
+        </li>
+        <li>
+          <strong>USB Data Transfer Block (<code>usbFileTransferDisabled</code>):</strong>
+          Disables MTP/PTP file transfers over USB cables while still allowing normal battery charging.
+        </li>
+        <li>
+          <strong>Play Store Application Allow-List (<code>playStoreMode: WHITELIST</code>):</strong>
+          Restricts Google Play so users can only install explicitly listed work packages.
+        </li>
+        <li>
+          <strong>Screen Capture &amp; Factory Reset Controls (<code>screenCaptureDisabled</code>, <code>factoryResetDisabled</code>):</strong>
+          Prevents screenshots/screen recordings and blocks unauthorized factory resets from the Settings app on fully-managed phones.
+        </li>
+        <li>
+          <strong>Screen-Lock Rules &amp; Remote Wipe (<code>passwordRequirements</code>, <code>enterprises.devices.delete</code>):</strong>
+          Enforces minimum PIN/password complexity and allows an administrator to factory-reset a lost fully-managed phone or remove a work profile remotely.
+        </li>
+      </ul>
+    </section>
+
+    <!-- LP-01 & LP-02 / Hard rule 7: Honest disclosure of what MDM can and cannot see -->
+    <section class="card" id="privacy-visibility">
+      <h2>What an MDM Provider Can and Cannot See</h2>
+      <p class="section-subtitle">
+        Plain-language disclosure: managing a phone through Google AMAPI gives the enterprise administrator
+        specific device telemetry and remote actions, while personal content inside apps stays private.
+      </p>
+      <div class="visibility-columns">
+        <div class="vis-box" id="what-mdm-can-see">
+          <h3>What the Administrator CAN See &amp; Do</h3>
+          <ul>
+            <li>Device hardware model, brand, and Android OS version reported by AMAPI.</li>
+            <li>Last status report timestamp and policy compliance state (plus which setting is out of compliance).</li>
+            <li>Names and version numbers of installed application packages (when <code>applicationReportsEnabled</code> is on).</li>
+            <li>Network metadata (Wi-Fi SSID / MAC address on fully-managed devices) and power/memory status reports.</li>
+            <li>Remote actions: switch policies, push or remove managed apps, and factory-reset a fully-managed device (or delete a work profile).</li>
+          </ul>
+        </div>
+        <div class="vis-box" id="what-mdm-cannot-see">
+          <h3>What the Administrator CANNOT See</h3>
+          <ul>
+            <li>SMS text messages, call audio, or personal chat messages inside apps (such as WhatsApp or Signal).</li>
+            <li>Photos, videos, documents, or local files stored on the device.</li>
+            <li>Web browsing history, search queries, or passwords typed into websites and apps.</li>
+            <li>Personal-side apps, photos, or accounts when enrolled in <strong>Work Profile</strong> mode.</li>
+            <li>Live screen viewing or microphone/camera feeds (AMAPI does not provide screen streaming).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- LP-03 & LP-04: Sign-up form that sends nothing anywhere -->
+    <section class="card" id="demo-signup">
+      <h2>Request a Managed Setup (Mock Demo Form)</h2>
+      <p class="section-subtitle">
+        <strong>Portfolio demo notice:</strong> This form is a front-end mock for Milestone M5.
+        No backend, third-party form service, or browser storage is connected.
+      </p>
+
+      <form class="signup-form" id="mock-signup-form" novalidate>
+        <div class="form-two-col">
+          <div class="form-field">
+            <label for="signup-name">Your Name</label>
+            <input
+              type="text"
+              id="signup-name"
+              name="name"
+              placeholder="e.g. Alex Rivera"
+              required
+            >
+          </div>
+
+          <div class="form-field">
+            <label for="signup-email">Work Email</label>
+            <input
+              type="email"
+              id="signup-email"
+              name="email"
+              placeholder="e.g. alex@example.com"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="form-two-col">
+          <div class="form-field">
+            <label for="signup-company-type">Company Type</label>
+            <select id="signup-company-type" name="company_type" required>
+              <option value="field-services">Field services / logistics</option>
+              <option value="clinic-healthcare">Clinic / healthcare practice</option>
+              <option value="agency-consulting">Agency / small business</option>
+              <option value="retail-hospitality">Retail / hospitality</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="signup-phone-count">Number of Android Phones</label>
+            <input
+              type="number"
+              id="signup-phone-count"
+              name="phone_count"
+              min="1"
+              max="500"
+              value="12"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="signup-biggest-worry">Biggest Worry About Your Team’s Phones</label>
+          <textarea
+            id="signup-biggest-worry"
+            name="biggest_worry"
+            rows="3"
+            placeholder="e.g. Lost phones in the field, employees installing unapproved apps, or copying files over USB."
+            required
+          ></textarea>
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-primary" id="signup-submit-btn">
+            Submit Mock Inquiry
+          </button>
+        </div>
+
+        <!-- LP-04 exact confirmation text -->
+        <p class="demo-submit-confirmation" id="signup-confirmation" role="status" hidden>
+          Thanks — this is a demo, nothing was sent or stored.
+        </p>
+      </form>
+    </section>
+
+    <footer class="site-footer">
+      <span>Sandstorm Secure — Portfolio Demo Landing Page (Milestone M5)</span>
+      <span>No external scripts, fonts, CDNs, or analytics.</span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var form = document.getElementById("mock-signup-form");
+      var confirmation = document.getElementById("signup-confirmation");
+      if (form && confirmation) {
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+          confirmation.textContent = "Thanks \u2014 this is a demo, nothing was sent or stored.";
+          confirmation.hidden = false;
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

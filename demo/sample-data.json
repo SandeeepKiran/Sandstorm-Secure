@@ -1,0 +1,112 @@
+{
+  "demo_label": "Demo data",
+  "demo_notice": "Demo data — All devices, policies, and enrollment tokens shown here are sample records from demo/sample-data.json. No Google Cloud account or Android device is connected.",
+  "version": "0.4.0",
+  "devices": [
+    {
+      "id": "sample-pixel6-01",
+      "model": "Pixel 6 (Emulator Sample)",
+      "android_version": "14",
+      "management_mode": "FULLY_MANAGED",
+      "policy": "baseline",
+      "last_seen": "2026-10-15T09:12:00Z",
+      "compliance_state": "COMPLIANT",
+      "is_wipe_allowed": true
+    },
+    {
+      "id": "sample-galaxya54-02",
+      "model": "Galaxy A54 (Work Profile Sample)",
+      "android_version": "14",
+      "management_mode": "WORK_PROFILE",
+      "policy": "relaxed",
+      "last_seen": "2026-10-15T09:10:00Z",
+      "compliance_state": "COMPLIANT",
+      "is_wipe_allowed": false
+    },
+    {
+      "id": "sample-motog54-03",
+      "model": "Moto G54 (Field Sample)",
+      "android_version": "13",
+      "management_mode": "FULLY_MANAGED",
+      "policy": "baseline",
+      "last_seen": "2026-10-15T08:45:00Z",
+      "compliance_state": "NON_COMPLIANT (alwaysOnVpnPackage)",
+      "is_wipe_allowed": true
+    }
+  ],
+  "policies": {
+    "baseline": {
+      "alwaysOnVpnPackage": {
+        "packageName": "com.wireguard.android",
+        "lockdownEnabled": true
+      },
+      "usbFileTransferDisabled": true,
+      "playStoreMode": "WHITELIST",
+      "applications": [
+        {
+          "packageName": "com.wireguard.android",
+          "installType": "AVAILABLE",
+          "defaultPermissionPolicy": "GRANT"
+        }
+      ],
+      "screenCaptureDisabled": true,
+      "factoryResetDisabled": true,
+      "passwordRequirements": {
+        "passwordMinimumLength": 6,
+        "passwordQuality": "NUMERIC_COMPLEX",
+        "passwordScope": "SCOPE_DEVICE"
+      },
+      "statusReportingSettings": {
+        "applicationReportsEnabled": true,
+        "deviceSettingsEnabled": true,
+        "displayInfoEnabled": true,
+        "hardwareStatusEnabled": true,
+        "memoryInfoEnabled": true,
+        "networkInfoEnabled": true,
+        "powerManagementEventsEnabled": true,
+        "softwareInfoEnabled": true
+      }
+    },
+    "relaxed": {
+      "usbFileTransferDisabled": false,
+      "playStoreMode": "BLACKLIST",
+      "applications": [
+        {
+          "packageName": "com.wireguard.android",
+          "installType": "AVAILABLE"
+        },
+        {
+          "packageName": "com.android.chrome",
+          "installType": "AVAILABLE"
+        },
+        {
+          "packageName": "com.google.android.calculator",
+          "installType": "AVAILABLE"
+        }
+      ],
+      "screenCaptureDisabled": false,
+      "factoryResetDisabled": false,
+      "passwordRequirements": {
+        "passwordMinimumLength": 4,
+        "passwordQuality": "NUMERIC",
+        "passwordScope": "SCOPE_DEVICE"
+      },
+      "statusReportingSettings": {
+        "applicationReportsEnabled": true,
+        "deviceSettingsEnabled": true,
+        "displayInfoEnabled": true,
+        "hardwareStatusEnabled": true,
+        "memoryInfoEnabled": true,
+        "networkInfoEnabled": true,
+        "powerManagementEventsEnabled": true,
+        "softwareInfoEnabled": true
+      }
+    }
+  },
+  "enrollment": {
+    "default_mode": "fully-managed",
+    "default_policy": "baseline",
+    "sample_expiration": "2026-10-15T10:30:00Z (1 hour sample token)",
+    "sample_output_file": "output/enroll-fully-managed-baseline.png (demo preview)"
+  }
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Sandstorm Secure{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="layout-shell">
+    <header class="top-header">
+      <div class="brand-block">
+        <p class="brand-title">
+          Sandstorm Secure
+          <span class="local-badge">Local 127.0.0.1 only</span>
+        </p>
+        <p class="brand-subtitle">
+          Android phone management via Google Android Management API (AMAPI)
+        </p>
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="/devices" class="nav-link {% if active_nav == 'devices' %}active{% endif %}">Devices</a>
+        <a href="/policies" class="nav-link {% if active_nav == 'policies' %}active{% endif %}">Policies</a>
+        <a href="/enroll" class="nav-link {% if active_nav == 'enroll' %}active{% endif %}">Enroll</a>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      {% if notice %}
+      <div class="banner banner-notice" role="status">{{ notice }}</div>
+      {% endif %}
+      {% if error %}
+      <div class="banner banner-error" role="alert">{{ error }}</div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <span>Sandstorm Secure v{{ version }} — Bound to 127.0.0.1 (never hosted publicly)</span>
+      <span>Every status shown comes directly from Google AMAPI responses.</span>
+    </footer>
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

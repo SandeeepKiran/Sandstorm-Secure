@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Policies (Demo Data) — Sandstorm Secure</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="layout-shell">
+    <!-- DM-02: Clear "Demo data" banner on every demo page -->
+    <div class="demo-data-banner" id="demo-data-banner" role="region" aria-label="Demo data notice">
+      <div>
+        <span class="demo-data-pill">Demo data</span>
+        <strong>Interactive portfolio preview loaded from <code>demo/sample-data.json</code>.</strong>
+        Toggle rules below to watch the AMAPI policy JSON update live in your browser.
+      </div>
+      <a href="../landing/index.html">Back to Landing Page</a>
+    </div>
+
+    <header class="top-header">
+      <div class="brand-block">
+        <p class="brand-title">
+          Sandstorm Secure
+          <span class="local-badge">Static Demo Mode</span>
+        </p>
+        <p class="brand-subtitle">
+          Android phone management via Google Android Management API (AMAPI) — Sample Dataset
+        </p>
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="./index.html" class="nav-link">Devices</a>
+        <a href="./policies.html" class="nav-link active">Policies</a>
+        <a href="./enroll.html" class="nav-link">Enroll</a>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <div class="banner banner-notice" id="demo-action-notice" role="status" hidden></div>
+
+      <div class="policies-grid">
+        <aside class="card">
+          <h1 class="card-title">Policy Files</h1>
+          <p class="secondary-note">
+            Sample policies from <code>demo/sample-data.json</code>. Click one to inspect or edit its toggles.
+          </p>
+          <ul class="policy-list" id="policy-list">
+            <li>
+              <a href="?policy=baseline" class="policy-item-link active" data-policy-id="baseline">
+                <span>baseline.json</span>
+                <span class="secondary-note" style="font-size: 0.78rem;">WHITELIST</span>
+              </a>
+            </li>
+            <li>
+              <a href="?policy=relaxed" class="policy-item-link" data-policy-id="relaxed">
+                <span>relaxed.json</span>
+                <span class="secondary-note" style="font-size: 0.78rem;">BLACKLIST</span>
+              </a>
+            </li>
+          </ul>
+        </aside>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Edit Policy (Demo): <code id="editing-policy-code">baseline</code></h2>
+              <p class="secondary-note">
+                In demo mode, changes update the live AMAPI JSON preview below in browser memory without writing to disk.
+              </p>
+            </div>
+          </div>
+
+          <div class="policy-summary-strip" aria-label="Active policy summary">
+            <span class="summary-chip">USB Data: <strong id="chip-usb">Blocked</strong></span>
+            <span class="summary-chip">Screen Capture: <strong id="chip-screen">Blocked</strong></span>
+            <span class="summary-chip">Play Store: <strong id="chip-play">WHITELIST</strong></span>
+            <span class="summary-chip">Always-On VPN: <strong id="chip-vpn">com.wireguard.android</strong></span>
+          </div>
+
+          <form class="form-grid" id="policy-edit-form">
+            <div class="form-row">
+              <label for="policy_id">Policy Name</label>
+              <input type="text" id="policy_id" name="policy_id" value="baseline" required>
+            </div>
+
+            <div class="form-section-title">Hardware &amp; Device Restrictions</div>
+
+            <label class="toggle-row" for="usb_file_transfer_disabled">
+              <input type="checkbox" id="usb_file_transfer_disabled" name="usb_file_transfer_disabled" checked>
+              <span class="toggle-text">
+                <span class="toggle-title">Disable USB file transfer (<code>usbFileTransferDisabled</code>)</span>
+                <span class="toggle-desc">Blocks MTP/PTP data transfer over USB cables while still allowing charging.</span>
+              </span>
+            </label>
+
+            <label class="toggle-row" for="screen_capture_disabled">
+              <input type="checkbox" id="screen_capture_disabled" name="screen_capture_disabled" checked>
+              <span class="toggle-text">
+                <span class="toggle-title">Disable screen capture (<code>screenCaptureDisabled</code>)</span>
+                <span class="toggle-desc">Prevents screenshots and screen recordings across the managed device or work profile.</span>
+              </span>
+            </label>
+
+            <label class="toggle-row" for="factory_reset_disabled">
+              <input type="checkbox" id="factory_reset_disabled" name="factory_reset_disabled" checked>
+              <span class="toggle-text">
+                <span class="toggle-title">Block user factory reset in Settings (<code>factoryResetDisabled</code>)</span>
+                <span class="toggle-desc">Applies to fully-managed devices; prevents resetting the device from the Settings app.</span>
+              </span>
+            </label>
+
+            <div class="form-section-title">Network &amp; Always-On VPN</div>
+
+            <label class="toggle-row" for="vpn_enabled">
+              <input type="checkbox" id="vpn_enabled" name="vpn_enabled" checked>
+              <span class="toggle-text">
+                <span class="toggle-title">Enable Always-On VPN (<code>alwaysOnVpnPackage</code>)</span>
+                <span class="toggle-desc">Automatically starts and maintains the specified VPN client package on the device.</span>
+              </span>
+            </label>
+
+            <div class="form-row">
+              <label for="vpn_package">Always-On VPN Package Name</label>
+              <input type="text" id="vpn_package" name="vpn_package" value="com.wireguard.android">
+            </div>
+
+            <label class="toggle-row" for="vpn_lockdown">
+              <input type="checkbox" id="vpn_lockdown" name="vpn_lockdown" checked>
+              <span class="toggle-text">
+                <span class="toggle-title">Enforce VPN lockdown (<code>lockdownEnabled</code>)</span>
+                <span class="toggle-desc">Blocks network traffic when the Always-On VPN tunnel is not connected.</span>
+              </span>
+            </label>
+
+            <div class="form-section-title">Play Store &amp; Application Allow-List</div>
+
+            <label class="toggle-row" for="play_store_whitelist_only">
+              <input type="checkbox" id="play_store_whitelist_only" name="play_store_whitelist_only" checked>
+              <span class="toggle-text">
+                <span class="toggle-title">Restrict Play Store to allow-list only (<code>playStoreMode: WHITELIST</code>)</span>
+                <span class="toggle-desc">When unchecked, sets <code>playStoreMode</code> to <code>BLACKLIST</code>.</span>
+              </span>
+            </label>
+
+            <div class="form-row">
+              <label for="allowed_packages">Allowed Applications (one Android package name per line)</label>
+              <textarea id="allowed_packages" name="allowed_packages" rows="4">com.wireguard.android</textarea>
+            </div>
+
+            <div class="form-section-title">Screen-Lock Requirements</div>
+
+            <div class="form-two-col">
+              <div class="form-row">
+                <label for="password_min_length">Minimum PIN / Password Length</label>
+                <input type="number" id="password_min_length" name="password_min_length" min="0" max="16" value="6">
+              </div>
+
+              <div class="form-row">
+                <label for="password_quality">Screen-Lock Password Quality</label>
+                <select id="password_quality" name="password_quality">
+                  <option value="NUMERIC">NUMERIC</option>
+                  <option value="NUMERIC_COMPLEX" selected>NUMERIC_COMPLEX</option>
+                  <option value="ALPHABETIC">ALPHABETIC</option>
+                  <option value="ALPHANUMERIC">ALPHANUMERIC</option>
+                  <option value="COMPLEX">COMPLEX</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <button type="submit" class="btn btn-primary" id="save-policy-btn">
+                Save Policy JSON (Demo Memory)
+              </button>
+            </div>
+          </form>
+
+          <div class="code-preview-header">
+            <h3>Live AMAPI Policy JSON Preview (<code id="disk-policy-code">policies/baseline.json</code>)</h3>
+          </div>
+          <pre class="code-preview" id="policy-json-preview">{
+  "alwaysOnVpnPackage": {
+    "packageName": "com.wireguard.android",
+    "lockdownEnabled": true
+  },
+  "usbFileTransferDisabled": true,
+  "playStoreMode": "WHITELIST",
+  "applications": [
+    {
+      "packageName": "com.wireguard.android",
+      "installType": "AVAILABLE",
+      "defaultPermissionPolicy": "GRANT"
+    }
+  ],
+  "screenCaptureDisabled": true,
+  "factoryResetDisabled": true,
+  "passwordRequirements": {
+    "passwordMinimumLength": 6,
+    "passwordQuality": "NUMERIC_COMPLEX",
+    "passwordScope": "SCOPE_DEVICE"
+  }
+}</pre>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <span>Sandstorm Secure v0.4.0 — Static Demo Build (Milestone M6)</span>
+      <span>Demo data only — no real enterprise IDs, keys, or devices.</span>
+    </footer>
+  </div>
+  <script src="./demo.js"></script>
+</body>
+</html>

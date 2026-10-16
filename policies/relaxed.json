@@ -1,0 +1,35 @@
+{
+  "usbFileTransferDisabled": false,
+  "playStoreMode": "BLACKLIST",
+  "applications": [
+    {
+      "packageName": "com.wireguard.android",
+      "installType": "AVAILABLE"
+    },
+    {
+      "packageName": "com.android.chrome",
+      "installType": "AVAILABLE"
+    },
+    {
+      "packageName": "com.google.android.calculator",
+      "installType": "AVAILABLE"
+    }
+  ],
+  "screenCaptureDisabled": false,
+  "factoryResetDisabled": false,
+  "passwordRequirements": {
+    "passwordMinimumLength": 4,
+    "passwordQuality": "NUMERIC",
+    "passwordScope": "SCOPE_DEVICE"
+  },
+  "statusReportingSettings": {
+    "applicationReportsEnabled": true,
+    "deviceSettingsEnabled": true,
+    "displayInfoEnabled": true,
+    "hardwareStatusEnabled": true,
+    "memoryInfoEnabled": true,
+    "networkInfoEnabled": true,
+    "powerManagementEventsEnabled": true,
+    "softwareInfoEnabled": true
+  }
+}

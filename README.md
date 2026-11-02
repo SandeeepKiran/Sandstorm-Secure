@@ -9,7 +9,7 @@ from a command-line interface or a local web dashboard.
 
 [![Sandstorm Secure launch video: pick the rules, scan one QR code, see which phones comply](docs/media/sandstorm-secure-launch.gif)](docs/media/sandstorm-secure-launch.mp4)
 
-*The 22-second launch video, made from the v5.0.0 demo pages with sample data. [Watch it in full quality, with sound (MP4)](docs/media/sandstorm-secure-launch.mp4).*
+*The 21-second launch video, made from the v5.1.0 demo pages with sample data. [Watch it in full quality, with sound (MP4)](docs/media/sandstorm-secure-launch.mp4).*
 
 **Status:** `v5.1.0`. Milestones M1 (Core + CLI), M2 (local web dashboard), M5 (mock landing page) and M6 (sample-data demo) are complete and tested offline. v5.1.0 adds a professional redesign, a dark theme and a Settings page for the Google key. Next: the live end-to-end proof on the Android emulator (M3) and work-profile mode (M4).
 

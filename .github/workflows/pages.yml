@@ -1,0 +1,56 @@
+# Publish ONLY the static landing page and demo to GitHub Pages.
+# The local dashboard (sandstorm/web) can wipe phones, so it is never published (AGENTS.md rule 8).
+name: Publish landing page and demo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "landing/**"
+      - "demo/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Keep the same folder layout as the repo, so the relative links
+      # between landing/ and demo/ work without changes.
+      - name: Build the site folder
+        run: |
+          mkdir -p _site
+          cp -r landing demo _site/
+          cat > _site/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>Sandstorm Secure</title>
+            <meta http-equiv="refresh" content="0; url=landing/">
+            <link rel="canonical" href="landing/">
+          </head>
+          <body><p><a href="landing/">Open the Sandstorm Secure product page</a></p></body>
+          </html>
+          HTML
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

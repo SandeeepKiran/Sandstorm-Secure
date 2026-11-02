@@ -1,71 +1,134 @@
 {% extends "base.html" %}
-{% block title %}Devices — Sandstorm Secure{% endblock %}
+{% import "_macros.html" as ui with context %}
+{% block title %}Devices{% endblock %}
+{% block page_title %}Devices{% endblock %}
 
 {% block content %}
-<section class="card">
-  <div class="card-header">
-    <div>
-      <h1 class="card-title">Enrolled Devices</h1>
-      <p class="secondary-note">
-        Displays live device telemetry reported by Google Android Management API.
-      </p>
-    </div>
-    <form method="get" action="/devices">
-      <button type="submit" class="btn btn-secondary" id="refresh-devices-btn">Refresh from AMAPI</button>
-    </form>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Devices</h1>
+    <p class="page-description">Android phones enrolled in your enterprise. Every value on this page comes from Google's Android Management API.</p>
   </div>
+  <div class="page-actions">
+    <form method="get" action="/devices">
+      {{ ui.google_button("Refresh", "refresh-devices-btn", icon="refresh-cw") }}
+    </form>
+    <a class="btn btn-primary" href="/enroll"><span class="icon" data-icon="qr-code"></span>Enroll a device</a>
+  </div>
+</div>
 
-  {% if devices %}
-  <table class="devices-table" id="devices-table">
+<section class="stat-grid" aria-label="Fleet summary" id="device-summary">
+  <div class="card stat-card">
+    <p class="stat-label"><span class="icon" data-icon="smartphone"></span>Total devices</p>
+    <p class="stat-value" id="stat-total">{{ summary.total if summary else "—" }}</p>
+    <p class="stat-hint">Enrolled in this enterprise</p>
+  </div>
+  <div class="card stat-card">
+    <p class="stat-label"><span class="stat-dot stat-dot-success"></span>Compliant</p>
+    <p class="stat-value" id="stat-compliant">{{ summary.compliant if summary else "—" }}</p>
+    <p class="stat-hint">Device reports every rule applied</p>
+  </div>
+  <div class="card stat-card">
+    <p class="stat-label"><span class="stat-dot stat-dot-danger"></span>Not compliant</p>
+    <p class="stat-value" id="stat-non-compliant">{{ summary.non_compliant if summary else "—" }}</p>
+    <p class="stat-hint">At least one rule not applied</p>
+  </div>
+  <div class="card stat-card">
+    <p class="stat-label"><span class="icon" data-icon="clock"></span>Last refresh</p>
+    <p class="stat-value stat-value-sm num" id="stat-last-refresh">{{ last_refresh or "—" }}</p>
+    <p class="stat-hint">Time of the last Google API read</p>
+  </div>
+</section>
+
+<section class="card table-card" aria-labelledby="devices-heading">
+  <h2 class="visually-hidden" id="devices-heading">Device list</h2>
+  {% if not setup.ready %}
+  <div class="empty-state" id="devices-setup-state">
+    <span class="empty-icon"><span class="icon" data-icon="plug"></span></span>
+    <p class="empty-title">Connect Google to see your devices</p>
+    <p class="empty-text">The device list comes from Google. Finish the setup on the Settings page, then come back here.</p>
+    <a class="btn btn-primary" href="/settings"><span class="icon" data-icon="settings"></span>Open Settings</a>
+  </div>
+  {% elif load_error %}
+  <div class="card-body">
+    <div class="callout callout-danger" role="alert">
+      <span class="icon" data-icon="circle-x"></span>
+      <p>Could not load devices: {{ load_error }}</p>
+    </div>
+  </div>
+  {% elif devices %}
+  <table class="table" id="devices-table">
     <thead>
       <tr>
-        <th>Device ID</th>
-        <th>Model</th>
-        <th>Android</th>
-        <th>Active Policy</th>
-        <th>Last Seen</th>
-        <th>Compliance State</th>
-        <th>Switch Policy</th>
-        <th>Actions</th>
+        <th scope="col">Device</th>
+        <th scope="col">Android</th>
+        <th scope="col">Policy</th>
+        <th scope="col">Compliance</th>
+        <th scope="col">Last seen</th>
+        <th scope="col" class="col-actions"><span class="visually-hidden">Actions</span></th>
       </tr>
     </thead>
     <tbody>
       {% for dev in devices %}
       <tr data-device-id="{{ dev.id }}">
-        <td data-label="Device ID"><code>{{ dev.id }}</code></td>
-        <td data-label="Model">{{ dev.model }}</td>
-        <td data-label="Android">{{ dev.android_version }}</td>
-        <td data-label="Active Policy"><span class="policy-tag">{{ dev.policy }}</span></td>
-        <td data-label="Last Seen">{{ dev.last_seen }}</td>
-        <td data-label="Compliance State">
-          <span class="status-pill {% if 'NON_COMPLIANT' in dev.compliance_state %}status-pill-warn{% endif %}">
-            {{ dev.compliance_state }}
-          </span>
+        <td class="cell-primary" data-label="Device">
+          <div class="device-cell">
+            <span class="device-avatar"><span class="icon" data-icon="smartphone"></span></span>
+            <div>
+              <span class="device-name">{{ dev.model }}</span>
+              <span class="device-id">{{ dev.id }}</span>
+            </div>
+          </div>
         </td>
-        <td data-label="Switch Policy">
-          <form method="post" action="/devices/{{ dev.id }}/switch-policy" class="inline-switch-form">
-            <select name="policy_name" aria-label="Select policy for {{ dev.id }}">
-              {% for pol_name in policy_names %}
-              <option value="{{ pol_name }}" {% if pol_name == dev.policy %}selected{% endif %}>
-                {{ pol_name }}
-              </option>
-              {% endfor %}
-            </select>
-            <button type="submit" class="btn btn-secondary">Apply</button>
-          </form>
+        <td data-label="Android" class="num">{{ dev.android_version }}</td>
+        <td data-label="Policy"><span class="tag active-policy-tag">{{ dev.policy }}</span></td>
+        <td data-label="Compliance">
+          <div>
+            {% if dev.compliance.tone == "compliant" %}
+            <span class="pill pill-success compliance-pill">{{ dev.compliance.label }}</span>
+            {% elif dev.compliance.tone == "non_compliant" %}
+            <span class="pill pill-danger compliance-pill">{{ dev.compliance.label }}</span>
+            {% else %}
+            <span class="pill compliance-pill">{{ dev.compliance.label }}</span>
+            {% endif %}
+            {% if dev.compliance.detail %}<span class="cell-detail">{{ dev.compliance.detail }}</span>{% endif %}
+          </div>
         </td>
-        <td data-label="Actions">
-          {% if dev.is_wipe_allowed %}
-          <button
-            type="button"
-            class="btn btn-danger open-wipe-modal-btn"
-            data-target-device="{{ dev.id }}"
-          >
-            Wipe…
-          </button>
-          {% else %}
-          <span class="secondary-note">Not in wipe allow-list</span>
-          {% endif %}
+        <td data-label="Last seen" class="num">
+          <time datetime="{{ dev.last_seen }}" title="{{ dev.last_seen }}">{{ dev.last_seen | timestamp }}</time>
+        </td>
+        <td class="col-actions">
+          <details class="menu row-menu">
+            <summary class="btn btn-ghost btn-icon btn-sm" aria-label="Actions for {{ dev.id }}">
+              <span class="icon" data-icon="ellipsis"></span>
+            </summary>
+            <div class="menu-panel">
+              <div class="menu-section">
+                <p class="menu-heading">Change policy</p>
+                <form method="post" action="/devices/{{ dev.id }}/switch-policy" class="inline-form inline-switch-form">
+                  <select class="select" name="policy_name" aria-label="Policy for {{ dev.id }}">
+                    {% for pol_name in policy_names %}
+                    <option value="{{ pol_name }}" {% if pol_name == dev.policy %}selected{% endif %}>{{ pol_name }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn btn-secondary btn-sm">Apply</button>
+                </form>
+              </div>
+              <div class="menu-section danger-zone">
+                <p class="menu-heading">Danger zone</p>
+                {% if dev.is_wipe_allowed %}
+                <p class="danger-note">Factory-resets a fully managed device, or removes its work profile. You must type the device ID to confirm.</p>
+                <div>
+                  <button type="button" class="btn btn-danger-outline btn-sm open-wipe-modal-btn" data-target-device="{{ dev.id }}">
+                    <span class="icon" data-icon="trash-2"></span>Wipe device…
+                  </button>
+                </div>
+                {% else %}
+                <p class="danger-note wipe-blocked-note"><span class="icon" data-icon="ban"></span> Not in wipe allow-list. Only devices in <code>allowed_test_devices</code> can be wiped.</p>
+                {% endif %}
+              </div>
+            </div>
+          </details>
         </td>
       </tr>
       {% endfor %}
@@ -73,50 +136,43 @@
   </table>
   {% else %}
   <div class="empty-state" id="devices-empty-state">
-    <h2>No enrolled devices</h2>
-    <p>
-      No Android devices are currently returned by Google AMAPI for this enterprise.
-    </p>
-    <ol>
-      <li>Verify that your policies are uploaded on the <a href="/policies">Policies</a> page.</li>
-      <li>Open the <a href="/enroll">Enroll</a> page to generate a setup QR code for your <code>Pixel_6</code> emulator.</li>
-      <li>Scan the QR code from the emulator setup wizard (fully-managed) or work-profile prompt, then click <strong>Refresh from AMAPI</strong> above.</li>
-    </ol>
+    <span class="empty-icon"><span class="icon" data-icon="smartphone"></span></span>
+    <p class="empty-title">No enrolled devices</p>
+    <p class="empty-text">Google returned no devices for this enterprise. Enroll the Pixel_6 emulator with a QR code to see it here.</p>
+    <a class="btn btn-primary" href="/enroll"><span class="icon" data-icon="qr-code"></span>Enroll a device</a>
   </div>
   {% endif %}
 </section>
+{% endblock %}
 
-<!-- Typed confirmation dialog for allow-listed device wipe (DB-07 / CO-08) -->
-<div class="wipe-modal-backdrop" id="wipe-modal-backdrop" hidden>
-  <div class="wipe-modal" role="dialog" aria-modal="true" aria-labelledby="wipe-modal-title">
-    <span class="wipe-warning-badge">Destructive Action · Allow-Listed Test Device Only</span>
-    <h2 id="wipe-modal-title">Confirm Remote Device Wipe</h2>
-    <p>
-      <strong>What this will do:</strong> This sends an immediate <code>enterprises.devices.delete</code>
-      command to Google AMAPI. On a fully-managed device, this factory-resets the device back to the setup wizard.
-      On a work-profile device, this removes the work profile and leaves personal apps untouched.
-    </p>
-    <p>
-      To confirm, type the exact device ID <code id="wipe-expected-id"></code> below:
-    </p>
+{% block modals %}
+<div class="modal-backdrop" id="wipe-modal-backdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="wipe-modal-title" aria-describedby="wipe-modal-desc">
     <form method="post" id="wipe-confirm-form" action="">
-      <div class="form-row">
-        <label for="wipe-confirmation-input">Device ID confirmation</label>
-        <input
-          type="text"
-          id="wipe-confirmation-input"
-          name="confirmed_device_id"
-          placeholder="Type exact device ID to unlock wipe"
-          autocomplete="off"
-          required
-        >
+      <div class="modal-header">
+        <span class="modal-icon"><span class="icon icon-lg" data-icon="triangle-alert"></span></span>
+        <div>
+          <h2 class="modal-title" id="wipe-modal-title">Wipe this device?</h2>
+          <p class="muted">Allow-listed test device only. This cannot be undone.</p>
+        </div>
       </div>
-      <p class="banner banner-error" id="wipe-mismatch-error" hidden>
-        Typed confirmation does not match the device ID. No wipe request was sent.
-      </p>
-      <div class="modal-actions">
-        <button type="submit" class="btn btn-danger" id="wipe-submit-btn">Confirm Wipe</button>
-        <button type="button" class="btn btn-secondary" id="wipe-cancel-btn">Cancel</button>
+      <div class="modal-body">
+        <p id="wipe-modal-desc">
+          This sends <code>enterprises.devices.delete</code> to Google. On a fully managed device,
+          the phone factory-resets to the setup wizard. On a work-profile device, only the work
+          profile is removed and personal apps stay.
+        </p>
+        <div class="field">
+          <label class="field-label" for="wipe-confirmation-input">Type <code id="wipe-expected-id"></code> to confirm</label>
+          <input class="input input-mono" type="text" id="wipe-confirmation-input" name="confirmed_device_id" placeholder="Device ID" autocomplete="off" spellcheck="false" required data-autofocus>
+        </div>
+        <p class="field-error" id="wipe-mismatch-error" role="alert" hidden>
+          <span class="icon" data-icon="circle-x"></span>The text does not match the device ID. No wipe request was sent.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="wipe-cancel-btn" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-danger" id="wipe-submit-btn"><span class="icon" data-icon="trash-2"></span>Wipe device</button>
       </div>
     </form>
   </div>
@@ -126,46 +182,38 @@
 {% block scripts %}
 <script>
   (function () {
-    const backdrop = document.getElementById("wipe-modal-backdrop");
-    const expectedIdEl = document.getElementById("wipe-expected-id");
-    const form = document.getElementById("wipe-confirm-form");
-    const input = document.getElementById("wipe-confirmation-input");
-    const errorEl = document.getElementById("wipe-mismatch-error");
-    const cancelBtn = document.getElementById("wipe-cancel-btn");
-    let currentTargetId = "";
+    var backdrop = document.getElementById("wipe-modal-backdrop");
+    var expectedIdEl = document.getElementById("wipe-expected-id");
+    var form = document.getElementById("wipe-confirm-form");
+    var input = document.getElementById("wipe-confirmation-input");
+    var errorEl = document.getElementById("wipe-mismatch-error");
+    var currentTargetId = "";
 
     document.querySelectorAll(".open-wipe-modal-btn").forEach(function (btn) {
       btn.addEventListener("click", function () {
+        var menu = btn.closest("details");
+        var opener = menu ? menu.querySelector("summary") : btn;
+        if (menu) {
+          menu.open = false;
+        }
         currentTargetId = btn.getAttribute("data-target-device") || "";
         expectedIdEl.textContent = currentTargetId;
         form.setAttribute("action", "/devices/" + encodeURIComponent(currentTargetId) + "/wipe");
         input.value = "";
+        input.removeAttribute("aria-invalid");
         errorEl.hidden = true;
-        backdrop.hidden = false;
-        input.focus();
+        window.SandstormUI.openModal(backdrop, opener);
       });
     });
 
-    if (cancelBtn) {
-      cancelBtn.addEventListener("click", function () {
-        backdrop.hidden = true;
-      });
-    }
-
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && backdrop && !backdrop.hidden) {
-        backdrop.hidden = true;
+    // Check the typed ID in the browser too, so a typo never sends a request (DB-07).
+    form.addEventListener("submit", function (event) {
+      if (input.value.trim() !== currentTargetId) {
+        event.preventDefault();
+        input.setAttribute("aria-invalid", "true");
+        errorEl.hidden = false;
       }
     });
-
-    if (form) {
-      form.addEventListener("submit", function (event) {
-        if (input.value.trim() !== currentTargetId) {
-          event.preventDefault();
-          errorEl.hidden = false;
-        }
-      });
-    }
   })();
 </script>
 {% endblock %}

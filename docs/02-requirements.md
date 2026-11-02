@@ -42,7 +42,18 @@ work in some mode is itself a finding):
 | DB-06 | **Switch policy** from the device row. | Playwright with mock: request sent with correct device + policy. |
 | DB-07 | **Wipe** button only for allow-listed devices, with a typed-confirmation dialog (same rule as CO-08). | Playwright: button hidden for non-listed devices; wrong text → no request. |
 | DB-08 | Every status on screen MUST come from API data. No hard-coded "verified", "secure" or counts. | Code review + test with mocked data that changes. |
-| DB-09 | Owner's palette, works at 375 px with no sideways scroll, version in the footer. | Playwright screenshots at 375 px and 1280 px. |
+| DB-09 | Project palette (see "Visual style" in `AGENTS.md`), works at 375 px with no sideways scroll, version in the sidebar footer. | Playwright screenshots at 375 px and 1280 px. |
+
+## v5.1 — Settings and setup (dashboard)
+
+| ID | Requirement | How to verify |
+|---|---|---|
+| ST-01 | The Settings page MUST save the key file **path** (never the key) as `sa_key_path` in `sandstorm.local.json`. `SANDSTORM_SA_KEY` wins if set; the page shows the active source. | Playwright: save a valid path → file updated; env var set → page names it. |
+| ST-02 | Saving MUST refuse: a missing file, a file that is not JSON, `type` ≠ `service_account`, no `project_id` / `client_email`, and any path inside the project folder (with the reason). | Unit + Playwright tests for each case. |
+| ST-03 | The UI MUST never show the private key. It shows only `project_id` and `client_email`. | Test: fake private key text never appears in the page. |
+| ST-04 | "Test connection" MUST make one read-only AMAPI call and show a green or red plain-English result. | Mocked test: `enterprises.get` called; no delete/patch. |
+| ST-05 | Every page MUST show a red banner (key missing or invalid) or an amber banner (key OK, no enterprise), or no banner when both are OK. No raw config errors or local paths. | Playwright: three states. |
+| ST-06 | Buttons that need Google MUST be disabled while setup is incomplete, with an accessible tooltip "Set up the Google key in Settings first." | Playwright: disabled + tooltip text + focus shows it. |
 
 ## M3 — End-to-end proof on the emulator (fully managed)
 
@@ -82,8 +93,8 @@ A real phone is NOT used here unless the owner decides so later.
 
 | ID | Requirement | How to verify |
 |---|---|---|
-| DM-01 | A demo build of the dashboard pages that uses sample data from a JSON file — no Google account, no device. | Opens from the file system / static host. |
-| DM-02 | Every demo page shows a clear "Demo data" banner. | Visual check on every page. |
+| DM-01 | A demo build of the dashboard pages that uses sample data from one file (`demo/sample-data.js`, a strict-JSON object) — no Google account, no device. | Opens from the file system / static host. |
+| DM-02 | Every demo page shows a clear "Demo data" ribbon. | Visual check on every page. |
 | DM-03 | Demo build contains no keys, enterprise names, device IDs or local paths from the real setup. | `grep` the build for the real values → nothing. |
 | DM-04 | Dangerous buttons (wipe) are visibly disabled in demo mode. | Playwright check. |
 

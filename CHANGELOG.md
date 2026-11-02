@@ -2,6 +2,34 @@
 
 All notable changes to Sandstorm Secure are documented in this file.
 
+## [5.1.0] — 2026-11-02
+
+### Added
+- **Settings page** (`/settings`) with a "Google connection" card: save the path to the service-account key file as `sa_key_path` in the git-ignored `sandstorm.local.json`. The env var `SANDSTORM_SA_KEY` still wins, and the page shows which source is active.
+- Key path validation on save: the file must exist, be JSON, have `"type": "service_account"`, `project_id` and `client_email`. A path inside the project folder is refused, so the key cannot be committed by mistake. Only `project_id` and `client_email` are ever shown.
+- **Test connection** button: one read-only AMAPI call (`enterprises.get`, or `enterprises.list` before an enterprise exists) with a plain-English result (`amapi.check_connection`).
+- **Setup checklist** on Settings: key valid, enterprise registered, test device allow-listed, personal phone blocked (optional), each with a one-line fix.
+- **Setup banner** on every dashboard page: red when the key is missing or invalid, amber when the key is valid but no enterprise is registered. It replaces the raw "No enterprise_name found in …" error.
+- Buttons that need Google (Refresh, Upload, Save and upload, Generate QR code) are disabled while setup is incomplete, with an accessible tooltip.
+- Devices page summary cards: total devices, compliant, not compliant, last refresh (from real AMAPI data only; "—" when there is no data).
+- Dark theme (follows the system setting, with a manual switch saved in the browser).
+- `scripts/sync_shared_assets.py` (copies the shared design files to `demo/` and `landing/`) and `scripts/capture_screenshots.py` (README, landing hero and Open Graph images from the sample-data demo).
+- README screenshots in `docs/media/screenshots/`, and a 1200×630 Open Graph image for the landing page.
+- **Live site on GitHub Pages:** the landing page and the demo (`.github/workflows/pages.yml`). The dashboard is never published.
+- Tests for the banners, Settings validation, disabled buttons and tooltips, the connection test, the theme switch, the 375 px layout and identical shared files.
+
+### Changed
+- **New professional design** for the dashboard, demo and landing page: one shared stylesheet (`style.css`) and script (`ui.js`), self-hosted Inter font (SIL OFL) and Lucide icons (ISC). Light grey-white main area, dark navy sidebar, blue actions, a sand-coloured brand mark, and red/amber/green only for status. The teal-green gradient is gone from this project.
+- Dashboard layout: sidebar navigation, page headers, a clean device table (cards below 960 px), a row actions menu with a red **Danger zone** for wipe, toast messages instead of text banners, toggle switches with a sticky "unsaved changes" bar on Policies, and a 3-step stepper with "Download PNG" on Enroll.
+- The wipe dialog keeps the typed confirmation and allow-list check, and now traps keyboard focus and returns focus when it closes.
+- Device times show as `15 Oct 2026, 09:00 UTC` (the raw AMAPI value stays in the `datetime` attribute). Compliance shows as "Compliant", "Not compliant" (with the setting name) or "Not reported".
+- Demo (`demo/`): same shell and styles as the real dashboard, a "Demo data" ribbon on every page, a new Settings page with a labelled sample state, and five sample devices. Sample data now lives in one file, `demo/sample-data.js`.
+- Landing page rebuilt as a product page: hero with a real demo screenshot, features, how it works, transparency, FAQ, mock sign-up form and footer. No fake logos, testimonials or numbers.
+- Error messages no longer contain full local paths, only the file name `sandstorm.local.json`.
+
+### Removed
+- `demo/devices.html` (a copy of `demo/index.html`) and `demo/sample-data.json` (replaced by `demo/sample-data.js`).
+
 ## [5.0.0] — 2026-10-17
 
 ### Added

@@ -77,9 +77,13 @@ def mock_amapi_service(monkeypatch: pytest.MonkeyPatch) -> MagicMock:
 # ---------------------------------------------------------------------------
 
 
-def test_co01_missing_sa_key_env_var_fails_clearly(monkeypatch: pytest.MonkeyPatch) -> None:
-    """CO-01: Unset SANDSTORM_SA_KEY fails with a clear message and non-zero exit code."""
+def test_co01_missing_sa_key_env_var_fails_clearly(
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """CO-01: Unset SANDSTORM_SA_KEY (and no saved key path) fails clearly with exit code != 0."""
     monkeypatch.delenv("SANDSTORM_SA_KEY", raising=False)
+    # Isolate from the owner's real sandstorm.local.json, which may hold a saved sa_key_path.
+    monkeypatch.setenv("SANDSTORM_LOCAL_CONFIG", str(tmp_path / "sandstorm.local.json"))
 
     with pytest.raises(config.ConfigError, match="SANDSTORM_SA_KEY is not set"):
         config.get_sa_key_path()
@@ -96,6 +100,7 @@ def test_co01_nonexistent_sa_key_file_fails_clearly(
     """CO-01: Non-existent SANDSTORM_SA_KEY path fails with a clear error and exit code != 0."""
     missing_file = tmp_path / "does-not-exist.json"
     monkeypatch.setenv("SANDSTORM_SA_KEY", str(missing_file))
+    monkeypatch.setenv("SANDSTORM_LOCAL_CONFIG", str(tmp_path / "sandstorm.local.json"))
 
     with pytest.raises(config.ConfigError, match="does not exist"):
         config.get_sa_key_path()

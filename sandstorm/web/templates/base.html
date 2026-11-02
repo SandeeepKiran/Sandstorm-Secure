@@ -3,44 +3,111 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Sandstorm Secure{% endblock %}</title>
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}Dashboard{% endblock %} · Sandstorm Secure</title>
+  <link rel="preload" href="/static/vendor/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/ui.js"></script>
 </head>
 <body>
-  <div class="layout-shell">
-    <header class="top-header">
-      <div class="brand-block">
-        <p class="brand-title">
-          Sandstorm Secure
-          <span class="local-badge">Local 127.0.0.1 only</span>
-        </p>
-        <p class="brand-subtitle">
-          Android phone management via Google Android Management API (AMAPI)
-        </p>
-      </div>
-      <nav class="nav-links" aria-label="Primary">
-        <a href="/devices" class="nav-link {% if active_nav == 'devices' %}active{% endif %}">Devices</a>
-        <a href="/policies" class="nav-link {% if active_nav == 'policies' %}active{% endif %}">Policies</a>
-        <a href="/enroll" class="nav-link {% if active_nav == 'enroll' %}active{% endif %}">Enroll</a>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar" aria-label="Main navigation">
+      <a class="brand" href="/devices">
+        <span class="brand-mark"><span class="icon" data-icon="shield"></span></span>
+        <span>Sandstorm <span class="brand-name-accent">Secure</span></span>
+      </a>
+
+      <nav class="sidebar-nav" aria-label="Primary">
+        <p class="sidebar-label">Manage</p>
+        <a href="/devices" class="nav-link {% if active_nav == 'devices' %}active{% endif %}" {% if active_nav == 'devices' %}aria-current="page"{% endif %}>
+          <span class="icon" data-icon="smartphone"></span>Devices
+        </a>
+        <a href="/policies" class="nav-link {% if active_nav == 'policies' %}active{% endif %}" {% if active_nav == 'policies' %}aria-current="page"{% endif %}>
+          <span class="icon" data-icon="shield-check"></span>Policies
+        </a>
+        <a href="/enroll" class="nav-link {% if active_nav == 'enroll' %}active{% endif %}" {% if active_nav == 'enroll' %}aria-current="page"{% endif %}>
+          <span class="icon" data-icon="qr-code"></span>Enroll
+        </a>
       </nav>
-    </header>
 
-    <main class="main-content">
-      {% if notice %}
-      <div class="banner banner-notice" role="status">{{ notice }}</div>
+      <nav class="sidebar-nav" aria-label="Configuration">
+        <p class="sidebar-label">Configure</p>
+        <a href="/settings" class="nav-link {% if active_nav == 'settings' %}active{% endif %}" {% if active_nav == 'settings' %}aria-current="page"{% endif %}>
+          <span class="icon" data-icon="settings"></span>Settings
+          {% if not setup.ready %}<span class="nav-badge" title="Setup incomplete"></span><span class="visually-hidden">(setup incomplete)</span>{% endif %}
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <strong>Sandstorm Secure v{{ version }}</strong>
+        <span>Runs on this computer only</span>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button type="button" class="btn btn-ghost btn-icon nav-toggle" data-nav-toggle aria-controls="app-sidebar" aria-expanded="false" aria-label="Open menu">
+          <span class="icon icon-lg" data-icon="menu"></span>
+        </button>
+        <a class="brand" href="/devices">
+          <span class="brand-mark"><span class="icon" data-icon="shield"></span></span>
+          <span>Sandstorm <span class="brand-name-accent">Secure</span></span>
+        </a>
+        <p class="topbar-title">{% block page_title %}Dashboard{% endblock %}</p>
+        <div class="topbar-actions">
+          <span class="badge-local" title="The dashboard listens on 127.0.0.1 only">
+            <span class="icon" data-icon="lock"></span><span class="badge-local-text">Local · 127.0.0.1</span>
+          </span>
+          <button type="button" class="btn btn-ghost btn-icon theme-toggle" data-theme-toggle aria-label="Switch theme">
+            <span class="icon icon-moon" data-icon="moon"></span>
+            <span class="icon icon-sun" data-icon="sun"></span>
+          </button>
+        </div>
+      </header>
+
+      {% if not setup.key_ok %}
+      <div class="setup-banner setup-banner-danger" id="setup-banner" data-state="no-key" role="alert">
+        <span class="icon icon-lg" data-icon="triangle-alert"></span>
+        <p>Google key not set up. <span>Live features are off.</span></p>
+        {% if active_nav != 'settings' %}
+        <a class="btn btn-danger btn-sm" href="/settings" id="setup-banner-action">Open Settings</a>
+        {% endif %}
+      </div>
+      {% elif not setup.enterprise_ok %}
+      <div class="setup-banner setup-banner-warning" id="setup-banner" data-state="no-enterprise" role="status">
+        <span class="icon icon-lg" data-icon="triangle-alert"></span>
+        <p>Key OK. Enterprise not registered yet. <span>To fix it, run <code>python -m sandstorm create-enterprise</code> in a terminal, then reload this page.</span></p>
+        {% if active_nav != 'settings' %}
+        <a class="btn btn-secondary btn-sm" href="/settings" id="setup-banner-action">Open Settings</a>
+        {% endif %}
+      </div>
       {% endif %}
-      {% if error %}
-      <div class="banner banner-error" role="alert">{{ error }}</div>
-      {% endif %}
 
-      {% block content %}{% endblock %}
-    </main>
-
-    <footer class="site-footer">
-      <span>Sandstorm Secure v{{ version }} — Bound to 127.0.0.1 (never hosted publicly)</span>
-      <span>Every status shown comes directly from Google AMAPI responses.</span>
-    </footer>
+      <main class="content" id="main" tabindex="-1">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
   </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite">
+    {% if notice %}
+    <div class="toast toast-success" role="status">
+      <span class="icon toast-icon" data-icon="circle-check"></span>
+      <p class="toast-message">{{ notice }}</p>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-toast-close aria-label="Close message"><span class="icon" data-icon="x"></span></button>
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="toast toast-error" role="alert">
+      <span class="icon toast-icon" data-icon="circle-x"></span>
+      <p class="toast-message">{{ error }}</p>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-toast-close aria-label="Close message"><span class="icon" data-icon="x"></span></button>
+    </div>
+    {% endif %}
+  </div>
+
+  {% block modals %}{% endblock %}
   {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,11 +1,14 @@
-{
+/* Demo data for the static demo (M6). The ONE source of sample records.
+ * The object below is strict JSON, so tests can parse it. Every value is made up.
+ */
+window.SANDSTORM_DEMO_DATA = {
   "demo_label": "Demo data",
-  "demo_notice": "Demo data — All devices, policies, and enrollment tokens shown here are sample records from demo/sample-data.json. No Google Cloud account or Android device is connected.",
-  "version": "5.0.0",
+  "version": "5.1.0",
+  "last_refresh": "09:15:00 UTC",
   "devices": [
     {
       "id": "sample-pixel6-01",
-      "model": "Pixel 6 (Emulator Sample)",
+      "model": "Pixel 6",
       "android_version": "14",
       "management_mode": "FULLY_MANAGED",
       "policy": "baseline",
@@ -15,7 +18,7 @@
     },
     {
       "id": "sample-galaxya54-02",
-      "model": "Galaxy A54 (Work Profile Sample)",
+      "model": "Galaxy A54",
       "android_version": "14",
       "management_mode": "WORK_PROFILE",
       "policy": "relaxed",
@@ -25,13 +28,33 @@
     },
     {
       "id": "sample-motog54-03",
-      "model": "Moto G54 (Field Sample)",
+      "model": "Moto G54",
       "android_version": "13",
       "management_mode": "FULLY_MANAGED",
       "policy": "baseline",
       "last_seen": "2026-10-15T08:45:00Z",
       "compliance_state": "NON_COMPLIANT (alwaysOnVpnPackage)",
       "is_wipe_allowed": true
+    },
+    {
+      "id": "sample-pixel8-04",
+      "model": "Pixel 8",
+      "android_version": "15",
+      "management_mode": "FULLY_MANAGED",
+      "policy": "baseline",
+      "last_seen": "2026-10-15T09:14:00Z",
+      "compliance_state": "COMPLIANT",
+      "is_wipe_allowed": false
+    },
+    {
+      "id": "sample-tab-a9-05",
+      "model": "Galaxy Tab A9",
+      "android_version": "14",
+      "management_mode": "WORK_PROFILE",
+      "policy": "relaxed",
+      "last_seen": "2026-10-14T17:30:00Z",
+      "compliance_state": "UNREPORTED (PROVISIONING)",
+      "is_wipe_allowed": false
     }
   ],
   "policies": {
@@ -104,9 +127,12 @@
     }
   },
   "enrollment": {
-    "default_mode": "fully-managed",
-    "default_policy": "baseline",
-    "sample_expiration": "2026-10-15T10:30:00Z (1 hour sample token)",
-    "sample_output_file": "output/enroll-fully-managed-baseline.png (demo preview)"
+    "sample_expiration": "2026-10-15T10:30:00Z"
+  },
+  "settings": {
+    "sa_key_path": "D:\\keys\\sandstorm-service-account.json",
+    "project_id": "demo-project-000000",
+    "client_email": "sandstorm-demo@demo-project-000000.iam.gserviceaccount.com",
+    "enterprise_name": "enterprises/DEMO_SAMPLE_00"
   }
-}
+};

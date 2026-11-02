@@ -13,15 +13,19 @@ import pathlib
 import re
 from typing import Any
 
+from google.auth.exceptions import GoogleAuthError
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 import qrcode
 
 from sandstorm.config import (
+    ConfigError,
     SafetyError,
     extract_short_device_id,
     get_enterprise_name,
     get_sa_key_path,
+    load_local_config,
     read_project_id_from_sa_key,
     resolve_output_dir,
     resolve_policies_dir,
@@ -64,6 +68,60 @@ def build_amapi_service(sa_key_path: pathlib.Path | None = None) -> Any:
         credentials=credentials,
         cache_discovery=False,
     )
+
+
+def _explain_http_error(exc: HttpError) -> str:
+    """Turn a Google API error into one plain-English sentence (no key material)."""
+    status = int(getattr(exc.resp, "status", 0) or 0)
+    if status == 401:
+        return "Google rejected the key. Make a new key for the service account and try again."
+    if status == 403:
+        return (
+            "Google refused access. Check that the Android Management API is enabled "
+            "and that the service account has the Android Management User role."
+        )
+    if status == 404:
+        return "Google cannot find this enterprise. Check the enterprise name in Settings."
+    return f"Google returned an error (HTTP {status}). Try again later."
+
+
+def check_connection(
+    config_path: pathlib.Path | None = None,
+    service: Any | None = None,
+) -> dict[str, Any]:
+    """Make one read-only AMAPI call to prove the key works. Never raises.
+
+    With an enterprise: enterprises.get. Without one: enterprises.list for the
+    key's project. Neither call changes anything on Google's side.
+    """
+    try:
+        cfg = load_local_config(config_path)
+        enterprise_name = str(cfg.get("enterprise_name", "")).strip()
+        amapi = service or build_amapi_service()
+        if enterprise_name:
+            if not enterprise_name.startswith("enterprises/"):
+                enterprise_name = f"enterprises/{enterprise_name}"
+            amapi.enterprises().get(name=enterprise_name).execute()
+            message = f"Connected. Google returned enterprise {enterprise_name}."
+        else:
+            project_id = read_project_id_from_sa_key()
+            amapi.enterprises().list(projectId=project_id, pageSize=1).execute()
+            message = "Connected. The key works. Register an enterprise next."
+        return {"ok": True, "message": message}
+    except HttpError as exc:
+        return {"ok": False, "message": _explain_http_error(exc)}
+    except GoogleAuthError:
+        return {
+            "ok": False,
+            "message": "Google did not accept the key file. Make a new key and try again.",
+        }
+    except ConfigError as exc:
+        return {"ok": False, "message": str(exc)}
+    except OSError:
+        return {
+            "ok": False,
+            "message": "Could not reach Google. Check the internet connection and try again.",
+        }
 
 
 def normalize_policy_id(policy_ref: str) -> str:

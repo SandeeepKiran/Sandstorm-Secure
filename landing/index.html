@@ -3,624 +3,317 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sandstorm Secure — Managed Android Phone Lockdown (Portfolio Demo)</title>
-  <style>
-    /* Sandstorm Mock Landing Page (Milestone M5: LP-01 through LP-07)
-     * Owner's palette:
-     *   Background: linear-gradient(135deg, #0f766e 0%, #134e4a 45%, #0c1626 100%)
-     *   Accent:     #99f6e4
-     *   Body text:  #d5ece8
-     *   Secondary:  #a7d3cc
-     *   Headings:   #ffffff
-     *   Font:       Segoe UI / system sans-serif (no external fonts or CDNs)
-     */
-    :root {
-      --bg-gradient: linear-gradient(135deg, #0f766e 0%, #134e4a 45%, #0c1626 100%);
-      --surface-bg: rgba(12, 22, 38, 0.78);
-      --surface-elevated: rgba(19, 78, 74, 0.38);
-      --surface-border: rgba(153, 246, 228, 0.24);
-      --accent: #99f6e4;
-      --accent-strong: #5eead4;
-      --text-body: #d5ece8;
-      --text-secondary: #a7d3cc;
-      --text-heading: #ffffff;
-      --shadow-soft: 0 16px 36px rgba(6, 12, 22, 0.44);
-      --radius-card: 16px;
-      --radius-control: 8px;
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      width: 100%;
-      overflow-x: hidden;
-      background: var(--bg-gradient);
-      background-attachment: fixed;
-      color: var(--text-body);
-      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
-    }
-
-    h1, h2, h3 {
-      color: var(--text-heading);
-      margin-top: 0;
-      font-weight: 700;
-      letter-spacing: -0.015em;
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    a:hover,
-    a:focus-visible {
-      text-decoration: underline;
-    }
-
-    code {
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.88em;
-      background: rgba(6, 12, 22, 0.55);
-      color: var(--accent);
-      padding: 2px 6px;
-      border-radius: 5px;
-      border: 1px solid rgba(153, 246, 228, 0.16);
-    }
-
-    .page-shell {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 24px 20px 48px;
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-    }
-
-    /* LP-06: Visible portfolio demo notice banner */
-    .portfolio-demo-banner {
-      padding: 13px 18px;
-      border-radius: var(--radius-control);
-      background: rgba(15, 118, 110, 0.52);
-      border: 1px solid var(--accent);
-      color: var(--text-heading);
-      font-size: 0.93rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .demo-pill {
-      display: inline-block;
-      font-size: 0.76rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 3px 10px;
-      border-radius: 999px;
-      background: var(--accent);
-      color: #0c1626;
-      margin-right: 8px;
-    }
-
-    /* Top header */
-    .site-header {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 18px 24px;
-      background: var(--surface-bg);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .brand-name {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: var(--text-heading);
-      margin: 0;
-    }
-
-    .header-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      font-size: 0.94rem;
-      font-weight: 600;
-    }
-
-    /* Hero section */
-    .hero-card {
-      background: var(--surface-bg);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-card);
-      padding: 36px 32px;
-      box-shadow: var(--shadow-soft);
-      display: grid;
-      grid-template-columns: 1.25fr 0.95fr;
-      gap: 28px;
-      align-items: center;
-    }
-
-    .hero-headline {
-      font-size: 2.1rem;
-      line-height: 1.2;
-      margin-bottom: 14px;
-    }
-
-    .hero-lead {
-      font-size: 1.06rem;
-      color: var(--text-body);
-      margin: 0 0 22px;
-      max-width: 62ch;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 11px 20px;
-      border-radius: var(--radius-control);
-      font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid transparent;
-      text-decoration: none;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #0c1626;
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-strong);
-      text-decoration: none;
-    }
-
-    .btn-secondary {
-      background: rgba(153, 246, 228, 0.12);
-      color: var(--accent);
-      border-color: var(--surface-border);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(153, 246, 228, 0.22);
-      text-decoration: none;
-    }
-
-    /* Who it is for card inside hero */
-    .audience-box {
-      background: var(--surface-elevated);
-      border: 1px solid var(--surface-border);
-      border-radius: 12px;
-      padding: 22px;
-    }
-
-    .audience-box h2 {
-      font-size: 1.15rem;
-      margin-bottom: 10px;
-      color: var(--accent);
-    }
-
-    .audience-box p {
-      margin: 0 0 10px;
-      font-size: 0.94rem;
-    }
-
-    .audience-box p:last-child {
-      margin-bottom: 0;
-      color: var(--text-secondary);
-      font-size: 0.89rem;
-    }
-
-    /* Two-column content grid */
-    .section-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-
-    .card {
-      background: var(--surface-bg);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-card);
-      padding: 28px;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .card h2 {
-      font-size: 1.35rem;
-      margin-bottom: 8px;
-    }
-
-    .section-subtitle {
-      color: var(--text-secondary);
-      font-size: 0.93rem;
-      margin: 0 0 18px;
-    }
-
-    .feature-list {
-      margin: 0;
-      padding-left: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .feature-list li {
-      padding-left: 4px;
-    }
-
-    .feature-list strong {
-      color: var(--text-heading);
-    }
-
-    /* Visibility comparison (what MDM can and cannot see) */
-    .visibility-columns {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 14px;
-    }
-
-    .vis-box {
-      padding: 16px 18px;
-      border-radius: 10px;
-      background: rgba(6, 12, 22, 0.52);
-      border: 1px solid var(--surface-border);
-    }
-
-    .vis-box h3 {
-      font-size: 1rem;
-      margin-bottom: 10px;
-      color: var(--accent);
-    }
-
-    .vis-box ul {
-      margin: 0;
-      padding-left: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-size: 0.92rem;
-    }
-
-    /* Sign-up form (LP-03, LP-04) */
-    .signup-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      max-width: 640px;
-    }
-
-    .form-two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .form-field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-field label {
-      font-weight: 600;
-      font-size: 0.93rem;
-      color: var(--text-heading);
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="number"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: var(--radius-control);
-      border: 1px solid var(--surface-border);
-      background: rgba(12, 22, 38, 0.9);
-      color: var(--text-heading);
-      font-family: inherit;
-      font-size: 0.95rem;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      outline: 2px solid var(--accent);
-      outline-offset: 1px;
-    }
-
-    .demo-submit-confirmation {
-      padding: 14px 18px;
-      border-radius: var(--radius-control);
-      background: rgba(15, 118, 110, 0.55);
-      border: 1px solid var(--accent);
-      color: var(--text-heading);
-      font-weight: 600;
-    }
-
-    .demo-submit-confirmation[hidden] {
-      display: none;
-    }
-
-    .site-footer {
-      padding-top: 18px;
-      border-top: 1px solid var(--surface-border);
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--text-secondary);
-      font-size: 0.88rem;
-    }
-
-    @media (max-width: 768px) {
-      .page-shell {
-        padding: 14px 12px 32px;
-        gap: 20px;
-      }
-
-      .hero-card {
-        grid-template-columns: 1fr;
-        padding: 22px 18px;
-      }
-
-      .hero-headline {
-        font-size: 1.65rem;
-      }
-
-      .section-grid,
-      .visibility-columns,
-      .form-two-col {
-        grid-template-columns: 1fr;
-      }
-
-      .card {
-        padding: 18px 16px;
-      }
-    }
-  </style>
+  <meta name="color-scheme" content="light dark">
+  <title>Sandstorm Secure · Lock down company Android phones</title>
+  <meta name="description" content="Sandstorm Secure sets the rules for your team's Android phones: forced VPN, no USB file copy, approved apps only and remote wipe. Google's Android Management API enforces them. Portfolio demo.">
+  <!-- Open Graph: replace the relative image path with the full public URL when the page is published. -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Sandstorm Secure · Lock down company Android phones">
+  <meta property="og:description" content="Forced VPN, no USB file copy, approved apps only and remote wipe, enforced by Google's Android Management API. Portfolio demo.">
+  <meta property="og:image" content="https://sandeeepkiran.github.io/Sandstorm-Secure/landing/assets/og-image.png">
+  <meta property="og:url" content="https://sandeeepkiran.github.io/Sandstorm-Secure/landing/">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Sandstorm Secure dashboard with sample devices">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="./style.css">
+  <script src="./ui.js"></script>
 </head>
-<body>
-  <div class="page-shell">
-    <!-- LP-06: Visible note stating this is a portfolio demo and no data is collected -->
-    <div class="portfolio-demo-banner" id="portfolio-demo-note" role="note">
-      <div>
-        <span class="demo-pill">Portfolio Demo</span>
-        <strong>This page is a portfolio demo and no data is collected.</strong>
-        Submitting the form below sends no network requests and stores nothing.
-      </div>
-      <a href="../demo/index.html">Open Interactive Demo Dashboard</a>
+<body class="mkt">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- LP-06: visible note that this is a portfolio demo and no data is collected -->
+  <div class="mkt-notice" id="portfolio-demo-note" role="note">
+    <div class="mkt-container">
+      <strong>This page is a portfolio demo and no data is collected.</strong>
+      <span>The sign-up form sends nothing and stores nothing.</span>
+      <a href="../demo/index.html">Open the demo dashboard</a>
     </div>
-
-    <header class="site-header">
-      <p class="brand-name">Sandstorm Secure</p>
-      <nav class="header-links" aria-label="Page sections">
-        <a href="#what-it-does">What It Does</a>
-        <a href="#privacy-visibility">What MDM Can &amp; Cannot See</a>
-        <a href="#demo-signup">Mock Sign-Up Form</a>
-        <a href="../demo/index.html">Sample-Data Dashboard</a>
-      </nav>
-    </header>
-
-    <!-- LP-01: Headline + Who it is for -->
-    <section class="hero-card">
-      <div>
-        <h1 class="hero-headline" id="hero-headline">
-          Lock down company Android phones with Google’s official Android Management API.
-        </h1>
-        <p class="hero-lead">
-          Sandstorm Secure configures and enforces device rules — Always-On VPN, USB data transfer block,
-          Play Store allow-lists, and remote wipe — through a clean Python CLI and local dashboard,
-          so lost phones or accidental installs do not expose work data.
-        </p>
-        <div class="hero-actions">
-          <a href="#demo-signup" class="btn btn-primary">Try Mock Interest Form</a>
-          <a href="../demo/index.html" class="btn btn-secondary">Explore Sample Dashboard</a>
-        </div>
-      </div>
-
-      <aside class="audience-box" id="who-it-is-for">
-        <h2>Who This Is For</h2>
-        <p>
-          <strong>Small teams with 5 to 50 company Android phones and no dedicated IT administrator</strong> —
-          such as field service crews, clinics, delivery teams, and agencies that hand out work phones
-          or add managed work profiles to staff devices.
-        </p>
-        <p>
-          Instead of writing a custom Android agent, Sandstorm Secure uses Google’s built-in
-          <code>Android Device Policy</code> enforcement engine.
-        </p>
-      </aside>
-    </section>
-
-    <!-- LP-01: 3-5 bullets of what it does -->
-    <section class="card" id="what-it-does">
-      <h2>What Sandstorm Secure Enforces on Managed Phones</h2>
-      <p class="section-subtitle">
-        Every policy rule below maps directly to a documented Google Android Management API (AMAPI) setting.
-      </p>
-      <ul class="feature-list" id="capabilities-list">
-        <li>
-          <strong>Always-On VPN with Lockdown (<code>alwaysOnVpnPackage</code>):</strong>
-          Keeps your chosen VPN app (such as WireGuard) connected at all times and blocks network traffic when the tunnel is down.
-        </li>
-        <li>
-          <strong>USB Data Transfer Block (<code>usbFileTransferDisabled</code>):</strong>
-          Disables MTP/PTP file transfers over USB cables while still allowing normal battery charging.
-        </li>
-        <li>
-          <strong>Play Store Application Allow-List (<code>playStoreMode: WHITELIST</code>):</strong>
-          Restricts Google Play so users can only install explicitly listed work packages.
-        </li>
-        <li>
-          <strong>Screen Capture &amp; Factory Reset Controls (<code>screenCaptureDisabled</code>, <code>factoryResetDisabled</code>):</strong>
-          Prevents screenshots/screen recordings and blocks unauthorized factory resets from the Settings app on fully-managed phones.
-        </li>
-        <li>
-          <strong>Screen-Lock Rules &amp; Remote Wipe (<code>passwordRequirements</code>, <code>enterprises.devices.delete</code>):</strong>
-          Enforces minimum PIN/password complexity and allows an administrator to factory-reset a lost fully-managed phone or remove a work profile remotely.
-        </li>
-      </ul>
-    </section>
-
-    <!-- LP-01 & LP-02 / Hard rule 7: Honest disclosure of what MDM can and cannot see -->
-    <section class="card" id="privacy-visibility">
-      <h2>What an MDM Provider Can and Cannot See</h2>
-      <p class="section-subtitle">
-        Plain-language disclosure: managing a phone through Google AMAPI gives the enterprise administrator
-        specific device telemetry and remote actions, while personal content inside apps stays private.
-      </p>
-      <div class="visibility-columns">
-        <div class="vis-box" id="what-mdm-can-see">
-          <h3>What the Administrator CAN See &amp; Do</h3>
-          <ul>
-            <li>Device hardware model, brand, and Android OS version reported by AMAPI.</li>
-            <li>Last status report timestamp and policy compliance state (plus which setting is out of compliance).</li>
-            <li>Names and version numbers of installed application packages (when <code>applicationReportsEnabled</code> is on).</li>
-            <li>Network metadata (Wi-Fi SSID / MAC address on fully-managed devices) and power/memory status reports.</li>
-            <li>Remote actions: switch policies, push or remove managed apps, and factory-reset a fully-managed device (or delete a work profile).</li>
-          </ul>
-        </div>
-        <div class="vis-box" id="what-mdm-cannot-see">
-          <h3>What the Administrator CANNOT See</h3>
-          <ul>
-            <li>SMS text messages, call audio, or personal chat messages inside apps (such as WhatsApp or Signal).</li>
-            <li>Photos, videos, documents, or local files stored on the device.</li>
-            <li>Web browsing history, search queries, or passwords typed into websites and apps.</li>
-            <li>Personal-side apps, photos, or accounts when enrolled in <strong>Work Profile</strong> mode.</li>
-            <li>Live screen viewing or microphone/camera feeds (AMAPI does not provide screen streaming).</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- LP-03 & LP-04: Sign-up form that sends nothing anywhere -->
-    <section class="card" id="demo-signup">
-      <h2>Request a Managed Setup (Mock Demo Form)</h2>
-      <p class="section-subtitle">
-        <strong>Portfolio demo notice:</strong> This form is a front-end mock for Milestone M5.
-        No backend, third-party form service, or browser storage is connected.
-      </p>
-
-      <form class="signup-form" id="mock-signup-form" novalidate>
-        <div class="form-two-col">
-          <div class="form-field">
-            <label for="signup-name">Your Name</label>
-            <input
-              type="text"
-              id="signup-name"
-              name="name"
-              placeholder="e.g. Alex Rivera"
-              required
-            >
-          </div>
-
-          <div class="form-field">
-            <label for="signup-email">Work Email</label>
-            <input
-              type="email"
-              id="signup-email"
-              name="email"
-              placeholder="e.g. alex@example.com"
-              required
-            >
-          </div>
-        </div>
-
-        <div class="form-two-col">
-          <div class="form-field">
-            <label for="signup-company-type">Company Type</label>
-            <select id="signup-company-type" name="company_type" required>
-              <option value="field-services">Field services / logistics</option>
-              <option value="clinic-healthcare">Clinic / healthcare practice</option>
-              <option value="agency-consulting">Agency / small business</option>
-              <option value="retail-hospitality">Retail / hospitality</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <div class="form-field">
-            <label for="signup-phone-count">Number of Android Phones</label>
-            <input
-              type="number"
-              id="signup-phone-count"
-              name="phone_count"
-              min="1"
-              max="500"
-              value="12"
-              required
-            >
-          </div>
-        </div>
-
-        <div class="form-field">
-          <label for="signup-biggest-worry">Biggest Worry About Your Team’s Phones</label>
-          <textarea
-            id="signup-biggest-worry"
-            name="biggest_worry"
-            rows="3"
-            placeholder="e.g. Lost phones in the field, employees installing unapproved apps, or copying files over USB."
-            required
-          ></textarea>
-        </div>
-
-        <div>
-          <button type="submit" class="btn btn-primary" id="signup-submit-btn">
-            Submit Mock Inquiry
-          </button>
-        </div>
-
-        <!-- LP-04 exact confirmation text -->
-        <p class="demo-submit-confirmation" id="signup-confirmation" role="status" hidden>
-          Thanks — this is a demo, nothing was sent or stored.
-        </p>
-      </form>
-    </section>
-
-    <footer class="site-footer">
-      <span>Sandstorm Secure — Portfolio Demo Landing Page (Milestone M5)</span>
-      <span>No external scripts, fonts, CDNs, or analytics.</span>
-    </footer>
   </div>
+
+  <header class="mkt-nav">
+    <div class="mkt-container">
+      <a class="brand" href="#main">
+        <span class="brand-mark"><span class="icon" data-icon="shield"></span></span>
+        <span>Sandstorm <span class="brand-name-accent">Secure</span></span>
+      </a>
+      <nav class="mkt-links" aria-label="Page sections">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#transparency">Transparency</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="mkt-nav-actions">
+        <button type="button" class="btn btn-ghost btn-icon theme-toggle" data-theme-toggle aria-label="Switch theme"><span class="icon icon-moon" data-icon="moon"></span><span class="icon icon-sun" data-icon="sun"></span></button>
+        <a class="btn btn-primary btn-sm" href="#demo-signup">Get early access</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <!-- LP-01: headline -->
+    <section class="mkt-hero" aria-labelledby="hero-headline">
+      <div class="mkt-container">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="dot"></span>Built on Google's Android Management API</p>
+          <h1 class="hero-title" id="hero-headline">Lock down company Android phones. <span class="accent">Google enforces the rules.</span></h1>
+          <p class="hero-sub">Sandstorm Secure sets the rules for your team's phones: forced VPN, no USB file copy, approved apps only and remote wipe. You change them from one dashboard. Android applies them on the device.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-lg" href="#demo-signup">Get early access<span class="icon" data-icon="arrow-right"></span></a>
+            <a class="btn btn-secondary btn-lg" href="../demo/index.html">View the demo dashboard</a>
+          </div>
+          <div class="hero-meta">
+            <span><span class="icon" data-icon="check"></span>No custom app on the phone</span>
+            <span><span class="icon" data-icon="check"></span>Dashboard runs on your own computer</span>
+            <span><span class="icon" data-icon="check"></span>Android only</span>
+          </div>
+        </div>
+
+        <figure class="browser-frame">
+          <div class="browser-bar" aria-hidden="true">
+            <span class="browser-dots"><span></span><span></span><span></span></span>
+            <span class="browser-url">Sandstorm Secure · Devices</span>
+          </div>
+          <img src="assets/dashboard-demo.png" width="1440" height="900" alt="The Sandstorm Secure Devices page: summary cards for total, compliant and not compliant devices, and a table of five sample phones with their policy and compliance state.">
+        </figure>
+        <p class="browser-caption">Screenshot of the demo dashboard. All devices in it are sample data.</p>
+      </div>
+    </section>
+
+    <!-- LP-01: who it is for -->
+    <section class="mkt-section" aria-labelledby="audience-heading">
+      <div class="mkt-container">
+        <div class="card audience" id="who-it-is-for">
+          <div>
+            <p class="section-kicker">Who it is for</p>
+            <h2 id="audience-heading">Small teams with company phones and no IT department</h2>
+            <p class="audience-text">For a business with about 5 to 50 company Android phones. You hand out work phones, or you add a work profile to staff phones, and you need simple rules that the phone cannot skip.</p>
+          </div>
+          <ul class="audience-list">
+            <li><span class="icon" data-icon="check"></span>Field service and delivery crews</li>
+            <li><span class="icon" data-icon="check"></span>Clinics and care practices</li>
+            <li><span class="icon" data-icon="check"></span>Agencies and small offices</li>
+            <li><span class="icon" data-icon="check"></span>Shops and hospitality teams</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- LP-01: 3 to 5 points of what it does -->
+    <section class="mkt-section mkt-section-alt" id="features" aria-labelledby="features-heading">
+      <div class="mkt-container">
+        <div class="section-head">
+          <p class="section-kicker">Features</p>
+          <h2 class="section-title" id="features-heading">The rules a lost or shared phone needs</h2>
+          <p class="section-sub">Each rule is a documented setting in Google's Android Management API. Sandstorm Secure writes the policy. Android Device Policy enforces it on the phone.</p>
+        </div>
+        <ul class="feature-grid" id="capabilities-list">
+          <li class="card feature-card">
+            <span class="feature-icon"><span class="icon" data-icon="globe-lock"></span></span>
+            <h3 class="feature-title">Always-on VPN with lockdown</h3>
+            <p class="feature-text">Keeps your VPN app, such as WireGuard, connected. With lockdown on, the phone sends no traffic while the VPN is down.</p>
+            <p class="feature-key">alwaysOnVpnPackage</p>
+          </li>
+          <li class="card feature-card">
+            <span class="feature-icon"><span class="icon" data-icon="usb"></span></span>
+            <h3 class="feature-title">No USB file transfer</h3>
+            <p class="feature-text">Stops file copy to a computer over a USB cable. The phone still charges.</p>
+            <p class="feature-key">usbFileTransferDisabled</p>
+          </li>
+          <li class="card feature-card">
+            <span class="feature-icon"><span class="icon" data-icon="package"></span></span>
+            <h3 class="feature-title">Approved apps only</h3>
+            <p class="feature-text">The Play Store shows only the application packages on your allow-list. Nothing else can be installed from it.</p>
+            <p class="feature-key">playStoreMode: WHITELIST</p>
+          </li>
+          <li class="card feature-card">
+            <span class="feature-icon"><span class="icon" data-icon="camera-off"></span></span>
+            <h3 class="feature-title">Screenshot and reset controls</h3>
+            <p class="feature-text">Blocks screenshots and screen recording. On a fully managed phone, the user cannot factory-reset it from Settings.</p>
+            <p class="feature-key">screenCaptureDisabled · factoryResetDisabled</p>
+          </li>
+          <li class="card feature-card">
+            <span class="feature-icon"><span class="icon" data-icon="lock-keyhole"></span></span>
+            <h3 class="feature-title">Screen lock and remote wipe</h3>
+            <p class="feature-text">Sets a minimum PIN or password strength. An admin can wipe a lost fully managed phone, or remove only the work profile.</p>
+            <p class="feature-key">passwordRequirements · devices.delete</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="mkt-section" id="how-it-works" aria-labelledby="how-heading">
+      <div class="mkt-container">
+        <div class="section-head section-head-center">
+          <p class="section-kicker">How it works</p>
+          <h2 class="section-title" id="how-heading">Three steps from new phone to managed phone</h2>
+        </div>
+        <ol class="how-steps">
+          <li class="card how-step">
+            <h3>Connect Google</h3>
+            <p>Create a Google Cloud project and a service-account key. Register your business as an Android enterprise. Sandstorm Secure walks you through it.</p>
+          </li>
+          <li class="card how-step">
+            <h3>Choose the rules</h3>
+            <p>Start from the locked-down <code>baseline</code> policy or the lighter <code>relaxed</code> one. Turn rules on and off, then upload the policy to Google.</p>
+          </li>
+          <li class="card how-step">
+            <h3>Scan one QR code</h3>
+            <p>On a factory-fresh phone, scan the enrollment QR code from the setup wizard. Google installs Android Device Policy, which applies the rules.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- LP-01, LP-02, hard rule 7: honest list of what an admin can and cannot see -->
+    <section class="mkt-section mkt-section-alt" id="transparency" aria-labelledby="transparency-heading">
+      <div class="mkt-container">
+        <div class="section-head">
+          <p class="section-kicker">Transparency</p>
+          <h2 class="section-title" id="transparency-heading">What your admin can and cannot see</h2>
+          <p class="section-sub">A managed phone sends some information to the company that manages it. Here is exactly what Google's Android Management API gives the admin.</p>
+        </div>
+        <div class="visibility-grid">
+          <div class="card visibility-card can-see" id="what-mdm-can-see">
+            <h3><span class="icon icon-lg" data-icon="eye"></span>The admin can see and do</h3>
+            <ul>
+              <li><span class="icon" data-icon="info"></span><span>The phone's hardware model, brand and Android version.</span></li>
+              <li><span class="icon" data-icon="info"></span><span>When the phone last reported in, and if it follows the policy (and which setting it does not follow).</span></li>
+              <li><span class="icon" data-icon="info"></span><span>The names and versions of installed application packages, when application reports are on.</span></li>
+              <li><span class="icon" data-icon="info"></span><span>Network details (such as Wi-Fi network name on fully managed phones), battery and memory reports.</span></li>
+              <li><span class="icon" data-icon="info"></span><span>Remote actions: change the policy, add or remove managed apps, wipe a fully managed phone or delete a work profile.</span></li>
+            </ul>
+          </div>
+          <div class="card visibility-card cannot-see" id="what-mdm-cannot-see">
+            <h3><span class="icon icon-lg" data-icon="eye-off"></span>The admin cannot see</h3>
+            <ul>
+              <li><span class="icon" data-icon="ban"></span><span>SMS text messages, call audio, or chat messages in apps such as WhatsApp or Signal.</span></li>
+              <li><span class="icon" data-icon="ban"></span><span>Photos, videos, documents or other files on the phone.</span></li>
+              <li><span class="icon" data-icon="ban"></span><span>Web history, searches, or passwords typed into websites and apps.</span></li>
+              <li><span class="icon" data-icon="ban"></span><span>Anything on the personal side of a phone that uses a <strong>work profile</strong>.</span></li>
+              <li><span class="icon" data-icon="ban"></span><span>The live screen, microphone or camera. The API has no screen viewing.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mkt-section" id="faq" aria-labelledby="faq-heading">
+      <div class="mkt-container">
+        <div class="section-head section-head-center">
+          <p class="section-kicker">FAQ</p>
+          <h2 class="section-title" id="faq-heading">Questions</h2>
+        </div>
+        <div class="card faq">
+          <details class="faq-item">
+            <summary>Is Sandstorm Secure a real product?<span class="icon" data-icon="chevron-down"></span></summary>
+            <p class="faq-answer">It is a working portfolio project, not a product for sale. The app really applies policies through Google's Android Management API, and it is tested on an Android emulator. This page and its sign-up form are a demo.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Do my phones need a special app?<span class="icon" data-icon="chevron-down"></span></summary>
+            <p class="faq-answer">No custom app. During enrollment, Google installs its own Android Device Policy app. That app applies the rules on the phone.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Does it work with iPhone?<span class="icon" data-icon="chevron-down"></span></summary>
+            <p class="faq-answer">No. Sandstorm Secure supports Android only. Managing an iPhone needs Apple's own certificates and Apple Business Manager.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Is the dashboard on the internet?<span class="icon" data-icon="chevron-down"></span></summary>
+            <p class="faq-answer">No. The dashboard can wipe phones, so it runs only on your own computer, at 127.0.0.1. Only this page and the sample-data demo are meant to be public.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can my employer read my messages?<span class="icon" data-icon="chevron-down"></span></summary>
+            <p class="faq-answer">No. The admin cannot read messages, see photos or view your screen. See <a href="#transparency">What your admin can and cannot see</a> for the full list.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- LP-03, LP-04: sign-up form that sends nothing -->
+    <section class="mkt-section mkt-section-alt" id="demo-signup" aria-labelledby="signup-heading">
+      <div class="mkt-container signup-layout">
+        <div>
+          <p class="section-kicker">Early access</p>
+          <h2 class="section-title" id="signup-heading">Get early access</h2>
+          <p class="section-sub">Tell us about your phones. This is a mock form for a portfolio demo: it has no backend, no form service and no browser storage.</p>
+          <ul class="signup-points">
+            <li><span class="icon" data-icon="check"></span>Nothing you type leaves this page.</li>
+            <li><span class="icon" data-icon="check"></span>No cookies, analytics or trackers.</li>
+            <li><span class="icon" data-icon="check"></span>No external scripts or fonts.</li>
+          </ul>
+        </div>
+
+        <form class="card card-body signup-form" id="mock-signup-form" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label" for="signup-name">Your name</label>
+              <input class="input" type="text" id="signup-name" name="name" placeholder="Alex Rivera" autocomplete="off" required>
+            </div>
+            <div class="field">
+              <label class="field-label" for="signup-email">Work email</label>
+              <input class="input" type="email" id="signup-email" name="email" placeholder="alex@example.com" autocomplete="off" required>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label" for="signup-company-type">Company type</label>
+              <select class="select" id="signup-company-type" name="company_type" required>
+                <option value="field-services">Field services or logistics</option>
+                <option value="clinic-healthcare">Clinic or healthcare practice</option>
+                <option value="agency-consulting">Agency or small business</option>
+                <option value="retail-hospitality">Retail or hospitality</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="signup-phone-count">Number of Android phones</label>
+              <input class="input num" type="number" id="signup-phone-count" name="phone_count" min="1" max="500" value="12" required>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="signup-biggest-worry">Biggest worry about your team's phones</label>
+            <textarea class="textarea textarea-prose" id="signup-biggest-worry" name="biggest_worry" rows="3" placeholder="For example: lost phones, unapproved apps, or files copied over USB." required></textarea>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary" id="signup-submit-btn">Request early access</button>
+          </div>
+          <!-- LP-04: exact confirmation text -->
+          <p class="callout callout-success" id="signup-confirmation" role="status" hidden>Thanks — this is a demo, nothing was sent or stored.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="mkt-footer">
+    <div class="mkt-container">
+      <div>
+        <a class="brand" href="#main">
+          <span class="brand-mark"><span class="icon" data-icon="shield"></span></span>
+          <span>Sandstorm <span class="brand-name-accent">Secure</span></span>
+        </a>
+        <p>Portfolio demo. No external scripts, fonts, CDNs or analytics.</p>
+        <p>Inter font (SIL Open Font License) and Lucide icons (ISC licence).</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#transparency">Transparency</a>
+        <a href="#faq">FAQ</a>
+        <a href="../demo/index.html">Demo dashboard</a>
+      </nav>
+    </div>
+  </footer>
 
   <script>
     (function () {
       var form = document.getElementById("mock-signup-form");
       var confirmation = document.getElementById("signup-confirmation");
-      if (form && confirmation) {
-        form.addEventListener("submit", function (event) {
-          event.preventDefault();
-          confirmation.textContent = "Thanks \u2014 this is a demo, nothing was sent or stored.";
-          confirmation.hidden = false;
-        });
-      }
+      form.addEventListener("submit", function (event) {
+        // LP-04: never send the form anywhere.
+        event.preventDefault();
+        confirmation.textContent = "Thanks \u2014 this is a demo, nothing was sent or stored.";
+        confirmation.hidden = false;
+      });
     })();
   </script>
 </body>

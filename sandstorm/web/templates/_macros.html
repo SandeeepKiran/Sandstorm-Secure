@@ -1,0 +1,26 @@
+{#- A button that needs Google. While setup is incomplete it is disabled, and a
+    focusable wrapper shows the reason, because disabled buttons get no hover. -#}
+{% macro google_button(label, id, icon="", variant="btn-secondary", type="submit", attrs="", align="", size="") -%}
+{%- set inner -%}
+{%- if icon %}<span class="icon" data-icon="{{ icon }}"></span>{% endif %}{{ label }}
+{%- endset -%}
+{%- if setup.ready -%}
+<button type="{{ type }}" class="btn {{ variant }} {{ size }}" id="{{ id }}" {{ attrs | safe }}>{{ inner }}</button>
+{%- else -%}
+<span class="tooltip needs-setup {{ align }}" tabindex="0" aria-describedby="{{ id }}-tip">
+  <button type="{{ type }}" class="btn {{ variant }} {{ size }}" id="{{ id }}" disabled aria-describedby="{{ id }}-tip" {{ attrs | safe }}>{{ inner }}</button>
+  <span class="tooltip-text" role="tooltip" id="{{ id }}-tip">Set up the Google key in Settings first.</span>
+</span>
+{%- endif -%}
+{%- endmacro %}
+
+{% macro switch_row(name, title, desc, key, checked) -%}
+<label class="setting-row" for="{{ name }}">
+  <span class="setting-text">
+    <span class="setting-title">{{ title }}</span>
+    <span class="setting-desc">{{ desc }}</span>
+    <span class="setting-key">{{ key }}</span>
+  </span>
+  <input class="switch" type="checkbox" role="switch" id="{{ name }}" name="{{ name }}" value="true" {% if checked %}checked{% endif %}>
+</label>
+{%- endmacro %}

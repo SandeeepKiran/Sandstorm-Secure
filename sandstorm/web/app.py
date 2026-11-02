@@ -8,7 +8,9 @@ core modules (`sandstorm.amapi` and `sandstorm.config`).
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import pathlib
+from typing import Any
 from urllib.parse import urlencode
 
 from fastapi import FastAPI, Form, HTTPException, Request
@@ -22,6 +24,10 @@ LOOPBACK_HOST = "127.0.0.1"
 WEB_DIR = pathlib.Path(__file__).resolve().parent
 TEMPLATES_DIR = WEB_DIR / "templates"
 STATIC_DIR = WEB_DIR / "static"
+
+COMPLIANT = "compliant"
+NON_COMPLIANT = "non_compliant"
+UNREPORTED = "unreported"
 
 
 def validate_loopback_host(host: str) -> str:
@@ -43,6 +49,39 @@ def _collect_policy_names() -> list[str]:
     return sorted(names)
 
 
+def format_timestamp(raw: str) -> str:
+    """Show an AMAPI ISO timestamp as '15 Oct 2026, 09:00 UTC'. Unknown formats pass through."""
+    try:
+        parsed = datetime.fromisoformat(raw.strip())
+    except (AttributeError, ValueError):
+        return raw
+    if parsed.tzinfo is not None:
+        parsed = parsed.astimezone(timezone.utc)
+    return parsed.strftime("%d %b %Y, %H:%M UTC")
+
+
+def _compliance_view(compliance_state: str) -> dict[str, str]:
+    """Split the CO-06 compliance string into a pill tone, a label and a detail (DB-08)."""
+    state = compliance_state.strip()
+    detail = ""
+    if "(" in state and state.endswith(")"):
+        detail = state[state.index("(") + 1 : -1]
+    if state.startswith("NON_COMPLIANT"):
+        return {"tone": NON_COMPLIANT, "label": "Not compliant", "detail": detail}
+    if state.startswith("COMPLIANT"):
+        return {"tone": COMPLIANT, "label": "Compliant", "detail": detail}
+    return {"tone": UNREPORTED, "label": "Not reported", "detail": detail}
+
+
+def _summarize_devices(devices: list[dict[str, Any]]) -> dict[str, int]:
+    tones = [dev["compliance"]["tone"] for dev in devices]
+    return {
+        "total": len(devices),
+        "compliant": tones.count(COMPLIANT),
+        "non_compliant": tones.count(NON_COMPLIANT),
+    }
+
+
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application instance."""
     app = FastAPI(
@@ -54,12 +93,21 @@ def create_app() -> FastAPI:
 
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
     templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+    templates.env.filters["timestamp"] = format_timestamp
 
-    def _base_context(request: Request, active_nav: str) -> dict[str, object]:
+    def _base_context(
+        request: Request,
+        active_nav: str,
+        notice: str = "",
+        error: str = "",
+    ) -> dict[str, object]:
         return {
             "request": request,
             "active_nav": active_nav,
             "version": get_version(),
+            "setup": config.get_setup_status(),
+            "notice": notice,
+            "error": error,
         }
 
     @app.get("/", response_class=HTMLResponse)
@@ -73,33 +121,35 @@ def create_app() -> FastAPI:
         error: str = "",
     ) -> HTMLResponse:
         """DB-03, DB-06, DB-07, DB-08: Devices table with API status, policy switch, and wipe."""
-        devices: list[dict[str, object]] = []
-        api_error = error
-        allowed_ids: set[str] = set()
+        ctx = _base_context(request, "devices", notice, error)
+        setup = ctx["setup"]
+        devices: list[dict[str, Any]] = []
+        summary: dict[str, int] | None = None
+        last_refresh = ""
+        load_error = ""
 
-        try:
-            allowed_ids = config.get_allowed_test_devices()
-        except config.ConfigError as exc:
-            if not api_error:
-                api_error = str(exc)
+        # Without a key and an enterprise the setup banner explains what to do,
+        # so do not call Google and do not show a raw config error.
+        if setup["ready"]:
+            try:
+                allowed_ids = config.get_allowed_test_devices()
+                for dev in amapi.list_devices():
+                    dev_copy = dict(dev)
+                    dev_copy["is_wipe_allowed"] = dev["id"] in allowed_ids
+                    dev_copy["compliance"] = _compliance_view(str(dev["compliance_state"]))
+                    devices.append(dev_copy)
+                summary = _summarize_devices(devices)
+                last_refresh = datetime.now(timezone.utc).strftime("%H:%M:%S UTC")
+            except config.ConfigError as exc:
+                load_error = str(exc)
 
-        try:
-            raw_devices = amapi.list_devices()
-            for dev in raw_devices:
-                dev_copy = dict(dev)
-                dev_copy["is_wipe_allowed"] = dev["id"] in allowed_ids
-                devices.append(dev_copy)
-        except config.ConfigError as exc:
-            if not api_error:
-                api_error = str(exc)
-
-        ctx = _base_context(request, active_nav="devices")
         ctx.update(
             {
                 "devices": devices,
+                "summary": summary,
+                "last_refresh": last_refresh,
+                "load_error": load_error,
                 "policy_names": _collect_policy_names(),
-                "notice": notice,
-                "error": api_error,
             }
         )
         return templates.TemplateResponse(request, "devices.html", ctx)
@@ -172,15 +222,13 @@ def create_app() -> FastAPI:
             toggles = amapi.policy_to_toggles({})
             raw_json = {}
 
-        ctx = _base_context(request, active_nav="policies")
+        ctx = _base_context(request, "policies", notice, error)
         ctx.update(
             {
                 "policies": local_policies,
                 "selected_id": selected_id,
                 "toggles": toggles,
                 "raw_json": raw_json,
-                "notice": notice,
-                "error": error,
             }
         )
         return templates.TemplateResponse(request, "policies.html", ctx)
@@ -235,14 +283,13 @@ def create_app() -> FastAPI:
         error: str = "",
     ) -> HTMLResponse:
         """DB-05: Choose enrollment mode + policy to generate a QR code and expiry."""
-        ctx = _base_context(request, active_nav="enroll")
+        ctx = _base_context(request, "enroll", error=error)
         ctx.update(
             {
                 "policy_names": _collect_policy_names(),
                 "selected_mode": "fully-managed",
                 "selected_policy": "baseline",
                 "enrollment": None,
-                "error": error,
             }
         )
         return templates.TemplateResponse(request, "enroll.html", ctx)
@@ -264,14 +311,13 @@ def create_app() -> FastAPI:
         except (config.ConfigError, ValueError) as exc:
             error = str(exc)
 
-        ctx = _base_context(request, active_nav="enroll")
+        ctx = _base_context(request, "enroll", error=error)
         ctx.update(
             {
                 "policy_names": _collect_policy_names(),
                 "selected_mode": mode,
                 "selected_policy": policy_name,
                 "enrollment": enrollment,
-                "error": error,
             }
         )
         return templates.TemplateResponse(request, "enroll.html", ctx)
@@ -286,5 +332,58 @@ def create_app() -> FastAPI:
         if not qr_path.is_file():
             raise HTTPException(status_code=404, detail="QR image not found.")
         return FileResponse(qr_path, media_type="image/png")
+
+    def _render_settings(
+        request: Request,
+        notice: str = "",
+        error: str = "",
+        key_path_value: str | None = None,
+        key_path_error: str = "",
+        connection: dict[str, Any] | None = None,
+    ) -> HTMLResponse:
+        ctx = _base_context(request, "settings", notice, error)
+        if key_path_value is None:
+            try:
+                key_path_value = str(config.load_local_config().get("sa_key_path", ""))
+            except config.ConfigError:
+                key_path_value = ""
+        ctx.update(
+            {
+                "key_path_value": key_path_value,
+                "key_path_error": key_path_error,
+                "connection": connection,
+                "env_var_name": config.SA_KEY_ENV_VAR,
+            }
+        )
+        return templates.TemplateResponse(request, "settings.html", ctx)
+
+    @app.get("/settings", response_class=HTMLResponse)
+    def settings_page(request: Request, notice: str = "", error: str = "") -> HTMLResponse:
+        """Settings: Google key path, connection test and setup checklist."""
+        return _render_settings(request, notice, error)
+
+    @app.post("/settings/key", response_class=HTMLResponse)
+    def save_key_path_route(
+        request: Request,
+        sa_key_path: str = Form(""),
+    ) -> HTMLResponse:
+        """Validate and save the service-account key path (never the key itself)."""
+        try:
+            config.set_sa_key_path(sa_key_path)
+        except config.ConfigError as exc:
+            return _render_settings(
+                request,
+                key_path_value=sa_key_path,
+                key_path_error=str(exc),
+            )
+        return RedirectResponse(
+            url="/settings?" + urlencode({"notice": "Key path saved. The key file is valid."}),
+            status_code=303,
+        )
+
+    @app.post("/settings/test-connection", response_class=HTMLResponse)
+    def test_connection_route(request: Request) -> HTMLResponse:
+        """Make one read-only AMAPI call and show the plain-English result."""
+        return _render_settings(request, connection=amapi.check_connection())
 
     return app

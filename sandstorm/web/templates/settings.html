@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Settings</h1>
+    <p class="page-description">Connect Sandstorm Secure to Google. The key file stays on this computer, outside the project folder. Sandstorm reads it but never shows, copies or uploads the private key.</p>
+  </div>
+</div>
+
+<div class="grid-2">
+  <section class="card" aria-labelledby="google-heading" id="google-connection-card">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title" id="google-heading"><span class="icon" data-icon="key-round"></span>Google connection</h2>
+        <p class="card-description">A service-account key from your Google Cloud project.</p>
+      </div>
+      {% if setup.key_ok %}
+      <span class="pill pill-success" id="key-status-pill">Key valid</span>
+      {% else %}
+      <span class="pill pill-danger" id="key-status-pill">Not set up</span>
+      {% endif %}
+    </div>
+
+    <div class="card-body stack">
+      <div class="callout callout-info" id="key-source">
+        <span class="icon" data-icon="info"></span>
+        {% if setup.key_source == "env" %}
+        <p>Active source: the environment variable <code>{{ env_var_name }}</code>. It overrides the path saved here.</p>
+        {% elif setup.key_source == "settings" %}
+        <p>Active source: the path saved on this page.</p>
+        {% else %}
+        <p>No key is set. Save a path below, or set the environment variable <code>{{ env_var_name }}</code>.</p>
+        {% endif %}
+      </div>
+
+      <form method="post" action="/settings/key" class="field" id="key-form">
+        <label class="field-label" for="sa_key_path">Path to the service-account key file</label>
+        <input class="input input-mono" type="text" id="sa_key_path" name="sa_key_path" value="{{ key_path_value }}" placeholder="D:\keys\sandstorm-service-account.json" autocomplete="off" spellcheck="false" {% if key_path_error %}aria-invalid="true" aria-describedby="key-path-error"{% else %}aria-describedby="key-path-hint"{% endif %}>
+        {% if key_path_error %}
+        <p class="field-error" id="key-path-error" role="alert"><span class="icon" data-icon="circle-x"></span>{{ key_path_error }}</p>
+        {% else %}
+        <span class="field-hint" id="key-path-hint">The full path to the <code>.json</code> key file. Keep the file outside the project folder, so git can never commit it.</span>
+        {% endif %}
+      </form>
+
+      {% if setup.key_ok %}
+      <dl class="meta-list" id="key-details">
+        <dt>Project ID</dt><dd><code id="key-project-id">{{ setup.project_id }}</code></dd>
+        <dt>Service account</dt><dd><code id="key-client-email">{{ setup.client_email }}</code></dd>
+      </dl>
+      {% elif setup.key_source != "none" %}
+      <div class="callout callout-danger" id="key-invalid" role="alert">
+        <span class="icon" data-icon="circle-x"></span>
+        <p>The active key cannot be used. {{ setup.key_error }}</p>
+      </div>
+      {% endif %}
+
+      {% if connection %}
+      <div class="callout {% if connection.ok %}callout-success{% else %}callout-danger{% endif %}" id="connection-result" role="status" data-ok="{{ 'true' if connection.ok else 'false' }}">
+        <span class="icon" data-icon="{{ 'circle-check' if connection.ok else 'circle-x' }}"></span>
+        <p>{{ connection.message }}</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="card-footer">
+      <form method="post" action="/settings/test-connection">
+        {% if setup.key_ok %}
+        <button type="submit" class="btn btn-secondary" id="test-connection-btn"><span class="icon" data-icon="plug"></span>Test connection</button>
+        {% else %}
+        <span class="tooltip" tabindex="0" aria-describedby="test-connection-tip">
+          <button type="submit" class="btn btn-secondary" id="test-connection-btn" disabled aria-describedby="test-connection-tip"><span class="icon" data-icon="plug"></span>Test connection</button>
+          <span class="tooltip-text" role="tooltip" id="test-connection-tip">Save a valid key path first.</span>
+        </span>
+        {% endif %}
+      </form>
+      <button type="submit" class="btn btn-primary" form="key-form" id="save-key-btn"><span class="icon" data-icon="save"></span>Save path</button>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="checklist-heading">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title" id="checklist-heading"><span class="icon" data-icon="list-checks"></span>Setup checklist</h2>
+        <p class="card-description">Live features turn on when items 1 and 2 are done.</p>
+      </div>
+    </div>
+    <ul class="checklist" id="setup-checklist">
+      <li class="checklist-item" id="check-key" data-state="{{ 'ok' if setup.key_ok else 'fail' }}">
+        {% if setup.key_ok %}<span class="check-icon check-ok"><span class="icon" data-icon="check"></span></span>{% else %}<span class="check-icon check-fail"><span class="icon" data-icon="x"></span></span>{% endif %}
+        <div>
+          <p class="check-title">1. Key found and valid</p>
+          {% if setup.key_ok %}
+          <p class="check-fix">Service account <code>{{ setup.client_email }}</code>.</p>
+          {% else %}
+          <p class="check-fix">To fix it, save the path to your service-account key file on this page.</p>
+          {% endif %}
+        </div>
+      </li>
+      <li class="checklist-item" id="check-enterprise" data-state="{{ 'ok' if setup.enterprise_ok else 'fail' }}">
+        {% if setup.enterprise_ok %}<span class="check-icon check-ok"><span class="icon" data-icon="check"></span></span>{% else %}<span class="check-icon check-fail"><span class="icon" data-icon="x"></span></span>{% endif %}
+        <div>
+          <p class="check-title">2. Enterprise registered</p>
+          {% if setup.enterprise_ok %}
+          <p class="check-fix"><code>{{ setup.enterprise_name }}</code></p>
+          {% else %}
+          <p class="check-fix">To fix it, run <code>python -m sandstorm create-enterprise</code> in a terminal, then reload this page.</p>
+          {% endif %}
+        </div>
+      </li>
+      <li class="checklist-item" id="check-test-device" data-state="{{ 'ok' if setup.has_test_device else 'fail' }}">
+        {% if setup.has_test_device %}<span class="check-icon check-ok"><span class="icon" data-icon="check"></span></span>{% else %}<span class="check-icon check-fail"><span class="icon" data-icon="x"></span></span>{% endif %}
+        <div>
+          <p class="check-title">3. At least one test device on the allow-list</p>
+          {% if setup.has_test_device %}
+          <p class="check-fix">Wipe works for allow-listed devices only.</p>
+          {% else %}
+          <p class="check-fix">To fix it, add the emulator's device ID to <code>allowed_test_devices</code> in <code>sandstorm.local.json</code>.</p>
+          {% endif %}
+        </div>
+      </li>
+      <li class="checklist-item" id="check-blocked-device" data-state="{{ 'ok' if setup.has_blocked_device else 'optional' }}">
+        {% if setup.has_blocked_device %}<span class="check-icon check-ok"><span class="icon" data-icon="check"></span></span>{% else %}<span class="check-icon check-optional"><span class="icon" data-icon="x"></span></span>{% endif %}
+        <div>
+          <p class="check-title">4. Personal phone on the block list <span class="pill pill-plain">Optional</span></p>
+          {% if setup.has_blocked_device %}
+          <p class="check-fix">A blocked device can never be wiped, even if it is also allow-listed.</p>
+          {% else %}
+          <p class="check-fix">To protect a phone, add its device ID to <code>blocked_devices</code> in <code>sandstorm.local.json</code>.</p>
+          {% endif %}
+        </div>
+      </li>
+    </ul>
+  </section>
+</div>
+{% endblock %}

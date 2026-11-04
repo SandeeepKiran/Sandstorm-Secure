@@ -126,3 +126,7 @@ The env var `SANDSTORM_SA_KEY` overrides the saved path. The Settings page shows
 4. Run the tests. A test fails if the copies in `demo/` and `landing/` are different from the master copies.
 
 Credits: [Inter](https://rsms.me/inter/) font (SIL Open Font License 1.1) and [Lucide](https://lucide.dev) icons (ISC licence), stored in `sandstorm/web/static/vendor/`.
+
+## License
+
+[GNU Affero General Public License v3.0 or later](LICENSE) (AGPL-3.0-or-later). You may use, change and share it. If you share a changed version, or run it for others over a network, you must share its source code under the same licence.

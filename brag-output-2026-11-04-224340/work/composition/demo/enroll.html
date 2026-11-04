@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Enroll (Demo data) · Sandstorm Secure</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./ui.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar" aria-label="Main navigation">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark"><span class="icon" data-icon="shield"></span></span>
+        <span>Sandstorm <span class="brand-name-accent">Secure</span></span>
+      </a>
+      <nav class="sidebar-nav" aria-label="Primary">
+        <p class="sidebar-label">Manage</p>
+        <a href="./index.html" class="nav-link"><span class="icon" data-icon="smartphone"></span>Devices</a>
+        <a href="./policies.html" class="nav-link"><span class="icon" data-icon="shield-check"></span>Policies</a>
+        <a href="./enroll.html" class="nav-link active" aria-current="page"><span class="icon" data-icon="qr-code"></span>Enroll</a>
+      </nav>
+      <nav class="sidebar-nav" aria-label="Configuration">
+        <p class="sidebar-label">Configure</p>
+        <a href="./settings.html" class="nav-link"><span class="icon" data-icon="settings"></span>Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <strong data-demo-version>Sandstorm Secure</strong>
+        <span>Static demo with sample data</span>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button type="button" class="btn btn-ghost btn-icon nav-toggle" data-nav-toggle aria-controls="app-sidebar" aria-expanded="false" aria-label="Open menu"><span class="icon icon-lg" data-icon="menu"></span></button>
+        <a class="brand" href="./index.html">
+          <span class="brand-mark"><span class="icon" data-icon="shield"></span></span>
+          <span>Sandstorm <span class="brand-name-accent">Secure</span></span>
+        </a>
+        <p class="topbar-title">Enroll</p>
+        <div class="topbar-actions">
+          <span class="badge-local" title="This is a static demo with sample data"><span class="icon" data-icon="eye"></span><span class="badge-local-text">Demo · sample data</span></span>
+          <button type="button" class="btn btn-ghost btn-icon theme-toggle" data-theme-toggle aria-label="Switch theme"><span class="icon icon-moon" data-icon="moon"></span><span class="icon icon-sun" data-icon="sun"></span></button>
+        </div>
+      </header>
+
+      <!-- DM-02: clear "Demo data" ribbon on every demo page -->
+      <div class="demo-ribbon" id="demo-data-banner" role="note" aria-label="Demo data notice">
+        <strong>Demo data</strong>
+        <span>The QR code here is a sample picture. It has no enrollment token and cannot be scanned.</span>
+        <a href="../landing/index.html">Back to the product page</a>
+      </div>
+
+      <main class="content" id="main" tabindex="-1">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Enroll a device</h1>
+            <p class="page-description">Make a one-hour QR code. Scan it on the Pixel_6 emulator to put that device under a policy.</p>
+          </div>
+        </div>
+
+        <div class="callout callout-warning" role="note">
+          <span class="icon" data-icon="triangle-alert"></span>
+          <p><strong>Use the Pixel_6 emulator only.</strong> Do not enroll a personal phone. A fully managed enrollment gives the dashboard control of the whole device.</p>
+        </div>
+
+        <section class="card" aria-label="Enrollment progress">
+          <ol class="stepper" id="enroll-stepper">
+            <li class="step is-current" aria-current="step">
+              <span class="step-index">1</span>
+              <span>Choose mode<span class="step-sub">Fully managed or work profile</span></span>
+            </li>
+            <li class="step">
+              <span class="step-index">2</span>
+              <span>Generate QR<span class="step-sub">Google makes a one-hour token</span></span>
+            </li>
+            <li class="step">
+              <span class="step-index">3</span>
+              <span>Scan on the emulator<span class="step-sub">From the setup wizard</span></span>
+            </li>
+          </ol>
+        </section>
+
+        <div class="enroll-layout">
+          <form class="card" id="enroll-form">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Enrollment settings</h2>
+                <p class="card-description">The policy must be uploaded to Google first (Policies page).</p>
+              </div>
+            </div>
+            <div class="card-body stack">
+              <fieldset class="field fieldset">
+                <legend class="field-label">Enrollment mode</legend>
+                <div class="option-grid">
+                  <label class="option-card" for="mode-fully-managed">
+                    <input type="radio" id="mode-fully-managed" name="mode" value="fully-managed" checked>
+                    <span class="option-icon"><span class="icon" data-icon="smartphone"></span></span>
+                    <span><span class="option-title">Fully managed</span><span class="option-desc">A factory-fresh device at the Welcome screen. No personal use.</span></span>
+                  </label>
+                  <label class="option-card" for="mode-work-profile">
+                    <input type="radio" id="mode-work-profile" name="mode" value="work-profile">
+                    <span class="option-icon"><span class="icon" data-icon="briefcase"></span></span>
+                    <span><span class="option-title">Work profile</span><span class="option-desc">Adds a separate work side to a device that is already set up.</span></span>
+                  </label>
+                </div>
+              </fieldset>
+              <div class="field">
+                <label class="field-label" for="policy_name">Initial policy</label>
+                <select class="select" id="policy_name" name="policy_name">
+                  <option value="baseline" selected>baseline</option>
+                  <option value="relaxed">relaxed</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary" id="generate-qr-btn"><span class="icon" data-icon="qr-code"></span>Generate QR code</button>
+            </div>
+          </form>
+
+          <section class="card" id="enrollment-result" aria-labelledby="qr-heading" hidden>
+            <div class="card-header">
+              <div>
+                <h2 class="card-title" id="qr-heading">Sample QR code ready</h2>
+                <p class="card-description">Demo picture only. It cannot be scanned.</p>
+              </div>
+              <span class="pill pill-info">Demo data</span>
+            </div>
+            <div class="qr-frame">
+              <img src="" alt="Sample enrollment QR code (demo data, not scannable)" class="qr-image" id="enrollment-qr-img" width="220" height="220">
+            </div>
+            <div class="card-body">
+              <dl class="meta-list">
+                <dt>Mode</dt><dd id="demo-enroll-mode">fully-managed</dd>
+                <dt>Policy</dt><dd><code id="demo-enroll-policy">baseline</code></dd>
+                <dt>Expires</dt><dd id="enrollment-expiry"></dd>
+                <dt>File</dt><dd><code id="demo-enroll-file">enroll-fully-managed-baseline.png</code></dd>
+              </dl>
+            </div>
+            <div class="card-footer">
+              <span class="tooltip tooltip-end" tabindex="0" aria-describedby="download-tip">
+                <button type="button" class="btn btn-secondary" disabled aria-describedby="download-tip"><span class="icon" data-icon="download"></span>Download PNG</button>
+                <span class="tooltip-text" role="tooltip" id="download-tip">The demo makes no real QR code to download.</span>
+              </span>
+            </div>
+          </section>
+
+          <section class="card" id="enroll-how-to" aria-labelledby="how-heading">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title" id="how-heading"><span class="icon" data-icon="scan-line"></span>How to scan on the emulator</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <ol class="steps-list">
+                <li>For <strong>fully managed</strong>: factory-reset the emulator. On the Welcome screen, tap the screen 6 times to open the QR scanner.</li>
+                <li>For <strong>work profile</strong>: open the emulator's camera or setup prompt on a device that is already set up.</li>
+                <li>Point the emulator's virtual camera at the QR code. Follow the prompts.</li>
+                <li>Open <a href="./index.html">Devices</a> and select <strong>Refresh</strong> to see the new device.</li>
+              </ol>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <script src="./sample-data.js"></script>
+  <script src="./demo.js"></script>
+</body>
+</html>

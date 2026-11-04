@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Devices (Demo data) · Sandstorm Secure</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./ui.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar" aria-label="Main navigation">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark"><span class="icon" data-icon="shield"></span></span>
+        <span>Sandstorm <span class="brand-name-accent">Secure</span></span>
+      </a>
+      <nav class="sidebar-nav" aria-label="Primary">
+        <p class="sidebar-label">Manage</p>
+        <a href="./index.html" class="nav-link active" aria-current="page"><span class="icon" data-icon="smartphone"></span>Devices</a>
+        <a href="./policies.html" class="nav-link"><span class="icon" data-icon="shield-check"></span>Policies</a>
+        <a href="./enroll.html" class="nav-link"><span class="icon" data-icon="qr-code"></span>Enroll</a>
+      </nav>
+      <nav class="sidebar-nav" aria-label="Configuration">
+        <p class="sidebar-label">Configure</p>
+        <a href="./settings.html" class="nav-link"><span class="icon" data-icon="settings"></span>Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <strong data-demo-version>Sandstorm Secure</strong>
+        <span>Static demo with sample data</span>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button type="button" class="btn btn-ghost btn-icon nav-toggle" data-nav-toggle aria-controls="app-sidebar" aria-expanded="false" aria-label="Open menu"><span class="icon icon-lg" data-icon="menu"></span></button>
+        <a class="brand" href="./index.html">
+          <span class="brand-mark"><span class="icon" data-icon="shield"></span></span>
+          <span>Sandstorm <span class="brand-name-accent">Secure</span></span>
+        </a>
+        <p class="topbar-title">Devices</p>
+        <div class="topbar-actions">
+          <span class="badge-local" title="This is a static demo with sample data"><span class="icon" data-icon="eye"></span><span class="badge-local-text">Demo · sample data</span></span>
+          <button type="button" class="btn btn-ghost btn-icon theme-toggle" data-theme-toggle aria-label="Switch theme"><span class="icon icon-moon" data-icon="moon"></span><span class="icon icon-sun" data-icon="sun"></span></button>
+        </div>
+      </header>
+
+      <!-- DM-02: clear "Demo data" ribbon on every demo page -->
+      <div class="demo-ribbon" id="demo-data-banner" role="note" aria-label="Demo data notice">
+        <strong>Demo data</strong>
+        <span>Sample devices and policies. No Google account, key or phone is connected.</span>
+        <a href="../landing/index.html">Back to the product page</a>
+      </div>
+
+      <main class="content" id="main" tabindex="-1">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Devices</h1>
+            <p class="page-description">Android phones enrolled in your enterprise. In the real dashboard, every value comes from Google's Android Management API.</p>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn-secondary" id="refresh-devices-btn"><span class="icon" data-icon="refresh-cw"></span>Refresh</button>
+            <a class="btn btn-primary" href="./enroll.html"><span class="icon" data-icon="qr-code"></span>Enroll a device</a>
+          </div>
+        </div>
+
+        <section class="stat-grid" aria-label="Fleet summary" id="device-summary">
+          <div class="card stat-card">
+            <p class="stat-label"><span class="icon" data-icon="smartphone"></span>Total devices</p>
+            <p class="stat-value" id="stat-total">—</p>
+            <p class="stat-hint">Enrolled in this enterprise</p>
+          </div>
+          <div class="card stat-card">
+            <p class="stat-label"><span class="stat-dot stat-dot-success"></span>Compliant</p>
+            <p class="stat-value" id="stat-compliant">—</p>
+            <p class="stat-hint">Device reports every rule applied</p>
+          </div>
+          <div class="card stat-card">
+            <p class="stat-label"><span class="stat-dot stat-dot-danger"></span>Not compliant</p>
+            <p class="stat-value" id="stat-non-compliant">—</p>
+            <p class="stat-hint">At least one rule not applied</p>
+          </div>
+          <div class="card stat-card">
+            <p class="stat-label"><span class="icon" data-icon="clock"></span>Last refresh</p>
+            <p class="stat-value stat-value-sm num" id="stat-last-refresh">—</p>
+            <p class="stat-hint">Time of the last Google API read</p>
+          </div>
+        </section>
+
+        <section class="card table-card" aria-labelledby="devices-heading">
+          <h2 class="visually-hidden" id="devices-heading">Device list</h2>
+          <table class="table" id="devices-table">
+            <thead>
+              <tr>
+                <th scope="col">Device</th>
+                <th scope="col">Android</th>
+                <th scope="col">Policy</th>
+                <th scope="col">Compliance</th>
+                <th scope="col">Last seen</th>
+                <th scope="col" class="col-actions"><span class="visually-hidden">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="devices-tbody"></tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <script src="./sample-data.js"></script>
+  <script src="./demo.js"></script>
+</body>
+</html>

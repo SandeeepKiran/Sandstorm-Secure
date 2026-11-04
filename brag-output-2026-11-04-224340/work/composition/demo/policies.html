@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Policies (Demo data) · Sandstorm Secure</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./ui.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar" aria-label="Main navigation">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark"><span class="icon" data-icon="shield"></span></span>
+        <span>Sandstorm <span class="brand-name-accent">Secure</span></span>
+      </a>
+      <nav class="sidebar-nav" aria-label="Primary">
+        <p class="sidebar-label">Manage</p>
+        <a href="./index.html" class="nav-link"><span class="icon" data-icon="smartphone"></span>Devices</a>
+        <a href="./policies.html" class="nav-link active" aria-current="page"><span class="icon" data-icon="shield-check"></span>Policies</a>
+        <a href="./enroll.html" class="nav-link"><span class="icon" data-icon="qr-code"></span>Enroll</a>
+      </nav>
+      <nav class="sidebar-nav" aria-label="Configuration">
+        <p class="sidebar-label">Configure</p>
+        <a href="./settings.html" class="nav-link"><span class="icon" data-icon="settings"></span>Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <strong data-demo-version>Sandstorm Secure</strong>
+        <span>Static demo with sample data</span>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button type="button" class="btn btn-ghost btn-icon nav-toggle" data-nav-toggle aria-controls="app-sidebar" aria-expanded="false" aria-label="Open menu"><span class="icon icon-lg" data-icon="menu"></span></button>
+        <a class="brand" href="./index.html">
+          <span class="brand-mark"><span class="icon" data-icon="shield"></span></span>
+          <span>Sandstorm <span class="brand-name-accent">Secure</span></span>
+        </a>
+        <p class="topbar-title">Policies</p>
+        <div class="topbar-actions">
+          <span class="badge-local" title="This is a static demo with sample data"><span class="icon" data-icon="eye"></span><span class="badge-local-text">Demo · sample data</span></span>
+          <button type="button" class="btn btn-ghost btn-icon theme-toggle" data-theme-toggle aria-label="Switch theme"><span class="icon icon-moon" data-icon="moon"></span><span class="icon icon-sun" data-icon="sun"></span></button>
+        </div>
+      </header>
+
+      <!-- DM-02: clear "Demo data" ribbon on every demo page -->
+      <div class="demo-ribbon" id="demo-data-banner" role="note" aria-label="Demo data notice">
+        <strong>Demo data</strong>
+        <span>Change a rule and watch the policy JSON update. Nothing is saved or uploaded.</span>
+        <a href="../landing/index.html">Back to the product page</a>
+      </div>
+
+      <main class="content" id="main" tabindex="-1">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Policies</h1>
+            <p class="page-description">The rules Google enforces on each phone. Edit a policy, save it as JSON in <code>policies/</code>, then upload it to Google.</p>
+          </div>
+          <div class="page-actions">
+            <span class="tooltip tooltip-end" tabindex="0" aria-describedby="upload-header-tip">
+              <button type="button" class="btn btn-secondary" id="upload-policy-header-btn" disabled aria-describedby="upload-header-tip"><span class="icon" data-icon="upload"></span>Upload to Google</button>
+              <span class="tooltip-text" role="tooltip" id="upload-header-tip">Upload is off in the demo.</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="policies-layout">
+          <nav class="card subnav" aria-label="Policy files">
+            <ul class="subnav-list" id="policy-list">
+              <li><a href="?policy=baseline" class="subnav-link policy-item-link active" data-policy-id="baseline" aria-current="page"><span>baseline</span><span class="subnav-meta">whitelist</span></a></li>
+              <li><a href="?policy=relaxed" class="subnav-link policy-item-link" data-policy-id="relaxed"><span>relaxed</span><span class="subnav-meta">blacklist</span></a></li>
+            </ul>
+          </nav>
+
+          <form class="stack" id="policy-edit-form" data-dirty-bar="policy-save-bar">
+            <section class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">General</h2>
+                  <p class="card-description">Saves to <code>policies/&lt;name&gt;.json</code>. Type a new name to save a copy as a new policy.</p>
+                </div>
+              </div>
+              <div class="card-body stack">
+                <div class="field">
+                  <label class="field-label" for="policy_id">Policy name</label>
+                  <input class="input input-mono" type="text" id="policy_id" name="policy_id" value="baseline" pattern="[A-Za-z0-9_\-]+" required>
+                  <span class="field-hint">Letters, numbers, hyphens and underscores only.</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title"><span class="icon" data-icon="smartphone"></span>Device restrictions</h2>
+                  <p class="card-description">Hardware and system features on the phone.</p>
+                </div>
+              </div>
+              <label class="setting-row" for="usb_file_transfer_disabled">
+                <span class="setting-text"><span class="setting-title">Block USB file transfer</span><span class="setting-desc">Stops file copy over a USB cable. Charging still works.</span><span class="setting-key">usbFileTransferDisabled</span></span>
+                <input class="switch" type="checkbox" role="switch" id="usb_file_transfer_disabled" name="usb_file_transfer_disabled" value="true" checked>
+              </label>
+              <label class="setting-row" for="screen_capture_disabled">
+                <span class="setting-text"><span class="setting-title">Block screenshots and screen recording</span><span class="setting-desc">Applies to the managed device or the work profile.</span><span class="setting-key">screenCaptureDisabled</span></span>
+                <input class="switch" type="checkbox" role="switch" id="screen_capture_disabled" name="screen_capture_disabled" value="true" checked>
+              </label>
+              <label class="setting-row" for="factory_reset_disabled">
+                <span class="setting-text"><span class="setting-title">Block factory reset from Settings</span><span class="setting-desc">Fully managed devices only. An admin can still wipe the device.</span><span class="setting-key">factoryResetDisabled</span></span>
+                <input class="switch" type="checkbox" role="switch" id="factory_reset_disabled" name="factory_reset_disabled" value="true" checked>
+              </label>
+            </section>
+
+            <section class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title"><span class="icon" data-icon="globe-lock"></span>Network</h2>
+                  <p class="card-description">Force all traffic through a VPN app.</p>
+                </div>
+              </div>
+              <label class="setting-row" for="vpn_enabled">
+                <span class="setting-text"><span class="setting-title">Always-on VPN</span><span class="setting-desc">Starts the VPN app below and keeps it connected.</span><span class="setting-key">alwaysOnVpnPackage</span></span>
+                <input class="switch" type="checkbox" role="switch" id="vpn_enabled" name="vpn_enabled" value="true" checked>
+              </label>
+              <div class="setting-sub">
+                <div class="field">
+                  <label class="field-label" for="vpn_package">VPN app package name</label>
+                  <input class="input input-mono" type="text" id="vpn_package" name="vpn_package" value="com.wireguard.android">
+                </div>
+              </div>
+              <label class="setting-row" for="vpn_lockdown">
+                <span class="setting-text"><span class="setting-title">VPN lockdown</span><span class="setting-desc">Blocks all network traffic while the VPN is not connected.</span><span class="setting-key">alwaysOnVpnPackage.lockdownEnabled</span></span>
+                <input class="switch" type="checkbox" role="switch" id="vpn_lockdown" name="vpn_lockdown" value="true" checked>
+              </label>
+            </section>
+
+            <section class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title"><span class="icon" data-icon="package"></span>Apps</h2>
+                  <p class="card-description">Which Play Store apps the user can install.</p>
+                </div>
+              </div>
+              <label class="setting-row" for="play_store_whitelist_only">
+                <span class="setting-text"><span class="setting-title">Allow-listed apps only</span><span class="setting-desc">When off, the user can install any Play Store app that is not blocked.</span><span class="setting-key">playStoreMode: WHITELIST</span></span>
+                <input class="switch" type="checkbox" role="switch" id="play_store_whitelist_only" name="play_store_whitelist_only" value="true" checked>
+              </label>
+              <div class="setting-sub">
+                <div class="field">
+                  <label class="field-label" for="allowed_packages">Allowed apps</label>
+                  <textarea class="textarea" id="allowed_packages" name="allowed_packages" rows="4" spellcheck="false">com.wireguard.android</textarea>
+                  <span class="field-hint">One Android package name per line.</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title"><span class="icon" data-icon="lock-keyhole"></span>Screen lock</h2>
+                  <p class="card-description">Minimum strength of the PIN or password.</p>
+                </div>
+              </div>
+              <div class="card-body form-grid">
+                <div class="field">
+                  <label class="field-label" for="password_min_length">Minimum length</label>
+                  <input class="input num" type="number" id="password_min_length" name="password_min_length" min="0" max="16" value="6">
+                </div>
+                <div class="field">
+                  <label class="field-label" for="password_quality">Password quality</label>
+                  <select class="select" id="password_quality" name="password_quality">
+                    <option value="NUMERIC">NUMERIC</option>
+                    <option value="NUMERIC_COMPLEX" selected>NUMERIC_COMPLEX</option>
+                    <option value="ALPHABETIC">ALPHABETIC</option>
+                    <option value="ALPHANUMERIC">ALPHANUMERIC</option>
+                    <option value="COMPLEX">COMPLEX</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <div class="save-bar" id="policy-save-bar" role="region" aria-label="Unsaved changes" hidden>
+              <p class="save-bar-text"><span class="icon" data-icon="circle-dashed"></span>You have unsaved changes</p>
+              <button type="reset" class="btn btn-ghost" id="discard-policy-btn">Discard</button>
+              <button type="submit" class="btn btn-secondary" id="save-policy-btn"><span class="icon" data-icon="save"></span>Save</button>
+              <span class="tooltip tooltip-end" tabindex="0" aria-describedby="save-upload-tip">
+                <button type="button" class="btn btn-primary" id="save-upload-policy-btn" disabled aria-describedby="save-upload-tip"><span class="icon" data-icon="upload"></span>Save and upload</button>
+                <span class="tooltip-text" role="tooltip" id="save-upload-tip">Upload is off in the demo.</span>
+              </span>
+            </div>
+
+            <details class="card disclosure" open>
+              <summary>
+                <span class="card-title"><span class="icon" data-icon="file-json"></span>Policy JSON preview <code id="disk-policy-code">policies/baseline.json</code></span>
+                <span class="icon icon-chevron" data-icon="chevron-down"></span>
+              </summary>
+              <pre class="code-block" id="policy-json-preview"></pre>
+            </details>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <script src="./sample-data.js"></script>
+  <script src="./demo.js"></script>
+</body>
+</html>

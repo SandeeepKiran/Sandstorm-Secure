@@ -7,9 +7,9 @@ from a command-line interface or a local web dashboard.
 
 **Live site:** [Product page](https://sandeeepkiran.github.io/Sandstorm-Secure/landing/) · [Demo with sample data](https://sandeeepkiran.github.io/Sandstorm-Secure/demo/). The real dashboard runs only on your own computer (`127.0.0.1`), because it can wipe phones.
 
-[![Sandstorm Secure launch video: pick the rules, scan one QR code, see which phones comply](docs/media/sandstorm-secure-launch.gif)](docs/media/sandstorm-secure-launch.mp4)
+[![Sandstorm Secure launch video: flip a switch and the policy JSON follows](brag-output-2026-11-04-224340/brag.gif)](brag-output-2026-11-04-224340/brag.mp4)
 
-*The 21-second launch video, made from the v5.1.0 demo pages with sample data. [Watch it in full quality, with sound (MP4)](docs/media/sandstorm-secure-launch.mp4).*
+*The 23-second launch video, made from the v5.1.0 demo pages with sample data. [Watch it in full quality, with sound (MP4)](brag-output-2026-11-04-224340/brag.mp4). Poster: [brag.jpg](brag-output-2026-11-04-224340/brag.jpg). Earlier video: [docs/media/sandstorm-secure-launch.mp4](docs/media/sandstorm-secure-launch.mp4).*
 
 **Status:** `v5.1.0`. Milestones M1 (Core + CLI), M2 (local web dashboard), M5 (mock landing page) and M6 (sample-data demo) are complete and tested offline. v5.1.0 adds a professional redesign, a dark theme and a Settings page for the Google key. Next: the live end-to-end proof on the Android emulator (M3) and work-profile mode (M4).
 

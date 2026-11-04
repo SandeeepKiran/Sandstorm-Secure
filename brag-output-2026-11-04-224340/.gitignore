@@ -1,0 +1,8 @@
+# Keep everything needed to re-render. Ignore only installs, raw frame dumps and caches.
+node_modules/
+frames/
+stills/
+work/brag-raw.mp4
+__pycache__/
+*.pyc
+.cache/
